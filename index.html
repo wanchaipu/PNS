@@ -340,7 +340,7 @@ function drawCharts(totWW, totSub, totGP, fixed, be){
   // Chart 1: per-AU profit
   const ctx1 = $('chart1').getContext('2d');
   if(chart1) chart1.destroy();
-  const labels = items.map(i=>i.code);
+  const labels = items.map(i=>i.remark);
   const revs = items.map(i=>i.truePrice * (1-WW_CUT) * i.qty);
   const subs = items.map(i=>(Number($('sub'+i.idx).value)||0) * i.qty);
   const gps = revs.map((r,idx)=>r-subs[idx]);
