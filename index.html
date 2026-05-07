@@ -78,7 +78,7 @@
 <header>
   <h1>PNS – Profit Calculator งาน Decom (จาก FBOQ FTTX U6)</h1>
   <div class="meta">
-    Sheet: Decom &nbsp;•&nbsp; ลูกค้า: True &amp; WW &nbsp;•&nbsp; พื้นที่: ต่างจังหวัด &nbsp;•&nbsp; PNS รับงานต่อ → Outsource ให้ผู้รับเหมาช่วง
+    ตัวอย่างรับงาน 1 site Decom &nbsp;•&nbsp; ลูกค้า: True &amp; WW &nbsp;•&nbsp; PNS รับงานต่อ → Outsource ให้ผู้รับเหมาช่วง
   </div>
   <div class="flow">
     <span class="step">TRUE (ลูกค้า)</span>
@@ -220,11 +220,13 @@
 // True = ราคาเต็ม, WW = True × 0.85 (หัก 15%), Sub = ราคาผู้รับเหมาช่วง
 const WW_CUT = 0.15;
 const items = [
-  {idx:1, remark:'รื้อสายในต่างจังหวัด',              desc:'Remove OFC cable (Non-Usable)', unit:'M',   qty:118, truePrice:4,    subPrice:2},
-  {idx:2, remark:'รื้อตู้ในต่างจังหวัด',               desc:'Remove ODF Box',                unit:'EA',  qty:1,   truePrice:450,  subPrice:200},
-  {idx:3, remark:'ค่าหา Core /TER ODF ในต่างจังหวัด', desc:'Splice 1-12 cores per point',   unit:'EA',  qty:2,   truePrice:135,  subPrice:100},
-  {idx:4, remark:'ตัดต่อ',                              desc:'Service charge OTDR Test',       unit:'Set', qty:1,   truePrice:8000, subPrice:2000},
-  {idx:5, remark:'หา Core MW',                          desc:'OSP Cutover & Plan-work (ทำเอง)', unit:'Set', qty:1,   truePrice:2968, subPrice:0},
+  {idx:1, remark:'รื้อสาย',                desc:'Remove OFC cable (Non-Usable)',  unit:'M',   qty:118, truePrice:3,    subPrice:2},
+  {idx:2, remark:'รื้อตู้',                desc:'Remove ODF Box',                 unit:'EA',  qty:2,   truePrice:450,  subPrice:200},
+  {idx:3, remark:'ค่าหาCore ละ /TER ODF', desc:'1-12 cores per point',            unit:'EA',  qty:2,   truePrice:135,  subPrice:100},
+  {idx:4, remark:'ตัดต่อ',                 desc:'Service charge OTDR Test',        unit:'Set', qty:1,   truePrice:8000, subPrice:2000},
+  {idx:5, remark:'หา Core MW',             desc:'OSP Cutover & Plan-work (ทำเอง)', unit:'Set', qty:1,   truePrice:2968, subPrice:0},
+  {idx:6, remark:'ทำเล่ม',                 desc:'จัดทำรายงาน',                    unit:'Set', qty:1,   truePrice:0,    subPrice:500},
+  {idx:7, remark:'ทำ LLD',                 desc:'จัดทำ LLD',                       unit:'Set', qty:1,   truePrice:0,    subPrice:500},
 ];
 
 const fmt   = n => '฿' + Math.round(n).toLocaleString('en-US');
