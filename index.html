@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>PNS – Decom Profit Calculator (FBOQ FTTX U6)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#fff; --ink:#1a2332; --muted:#6b7a90;
+    --primary:#2563eb; --green:#16a34a; --red:#dc2626; --amber:#d97706; --teal:#0d9488;
+    --line:#e5e9f2;
+  }
+  *{box-sizing:border-box}
+  body{font-family:'Sarabun','Noto Sans Thai',Arial,sans-serif; margin:0; background:var(--bg); color:var(--ink); line-height:1.5}
+  .wrap{max-width:1300px; margin:0 auto; padding:24px}
+  header{background:linear-gradient(135deg,#1e3a8a,#2563eb); color:#fff; padding:28px 32px; border-radius:16px; margin-bottom:24px; box-shadow:0 8px 24px rgba(37,99,235,.18)}
+  header h1{margin:0 0 6px; font-size:22px; font-weight:700}
+  header .meta{font-size:13px; opacity:.85}
+  .flow{display:flex; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap; font-size:13px}
+  .flow .step{background:rgba(255,255,255,.18); padding:8px 14px; border-radius:10px; font-weight:600}
+  .flow .arrow{opacity:.7; font-size:18px}
+  .grid{display:grid; gap:20px}
+  .grid-2{grid-template-columns:1fr 1fr}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  .grid-4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:1000px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr 1fr}}
+  @media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+  .card{background:var(--card); border-radius:14px; padding:22px; box-shadow:0 2px 8px rgba(20,30,55,.06); border:1px solid var(--line)}
+  .card h2{margin:0 0 14px; font-size:17px; font-weight:700}
+  .badge{display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:600; margin-left:8px}
+  .badge.rev{background:#dcfce7; color:#166534}
+  .badge.cost{background:#fee2e2; color:#991b1b}
+  .badge.fix{background:#fef3c7; color:#92400e}
+  .badge.profit{background:#dbeafe; color:#1e40af}
+  .badge.cut{background:#fce7f3; color:#9f1239}
+  table{width:100%; border-collapse:collapse; font-size:13px}
+  th,td{padding:9px 7px; text-align:left; border-bottom:1px solid var(--line); vertical-align:middle}
+  th{background:#f8fafc; font-weight:700; color:var(--ink); font-size:11px; text-transform:uppercase; letter-spacing:.3px}
+  td.num,th.num{text-align:right; font-variant-numeric:tabular-nums}
+  td input{width:90px; padding:6px 8px; text-align:right; border:1px solid var(--line); border-radius:6px; font-size:13px; font-variant-numeric:tabular-nums; font-family:inherit}
+  td input:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+  tr.total td{font-weight:700; background:#f8fafc; border-top:2px solid var(--ink); font-size:14px}
+  .pos{color:var(--green); font-weight:600}
+  .neg{color:var(--red); font-weight:600}
+  .input-row{display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--line)}
+  .input-row label{font-size:14px}
+  .input-row label small{display:block; color:var(--muted); font-size:12px}
+  .input-row input{width:120px; padding:7px 10px; text-align:right; border:1px solid var(--line); border-radius:8px; font-size:14px; font-variant-numeric:tabular-nums; font-family:inherit}
+  .kpi{display:flex; flex-direction:column; padding:16px; border-radius:10px; background:#f8fafc; border:1px solid var(--line)}
+  .kpi .lbl{font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.5px}
+  .kpi .val{font-size:22px; font-weight:700; margin-top:4px; font-variant-numeric:tabular-nums}
+  .kpi .sub{font-size:12px; color:var(--muted); margin-top:2px}
+  .kpi.green{background:#f0fdf4; border-color:#bbf7d0} .kpi.green .val{color:var(--green)}
+  .kpi.red{background:#fef2f2; border-color:#fecaca} .kpi.red .val{color:var(--red)}
+  .kpi.amber{background:#fffbeb; border-color:#fde68a} .kpi.amber .val{color:var(--amber)}
+  .kpi.blue{background:#eff6ff; border-color:#bfdbfe} .kpi.blue .val{color:var(--primary)}
+  .kpi.pink{background:#fdf2f8; border-color:#fbcfe8} .kpi.pink .val{color:#9f1239}
+  .summary-row{display:flex; justify-content:space-between; padding:6px 0; font-size:14px}
+  .summary-row.tot{border-top:1px solid var(--line); padding-top:10px; margin-top:8px; font-weight:700; font-size:15px}
+  .note{font-size:12px; color:var(--muted); margin-top:12px; padding:10px 12px; background:#f8fafc; border-left:3px solid var(--primary); border-radius:6px}
+  .chart-wrap{position:relative; height:280px; margin-top:10px}
+  .section-title{font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin:0 0 8px; font-weight:700}
+  .pct-big{font-size:48px; font-weight:800; color:var(--green); line-height:1}
+  .pct-label{font-size:13px; color:var(--muted); margin-top:6px; font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>PNS – Profit Calculator งาน Decom (จาก FBOQ FTTX U6)</h1>
+  <div class="meta">
+    Sheet: Decom &nbsp;•&nbsp; ลูกค้า: True &amp; WW &nbsp;•&nbsp; PNS รับงานต่อ → Outsource ให้ผู้รับเหมาช่วง
+  </div>
+  <div class="flow">
+    <span class="step">TRUE (ลูกค้า)</span>
+    <span class="arrow">→</span>
+    <span class="step">WW (หัก 15%)</span>
+    <span class="arrow">→</span>
+    <span class="step">PNS</span>
+    <span class="arrow">→ จ้าง</span>
+    <span class="step">ผู้รับเหมาช่วง</span>
+    <span class="arrow">→ กำไรส่วนต่าง</span>
+  </div>
+</header>
+
+<!-- ============ KPI ROW ============ -->
+<div class="grid grid-4" style="margin-bottom:20px">
+  <div class="kpi blue">
+    <span class="lbl">รายได้ราคา True / งาน</span>
+    <span class="val" id="kTrue">฿12,042</span>
+    <span class="sub">ราคาเต็ม Customer</span>
+  </div>
+  <div class="kpi pink">
+    <span class="lbl">หัก WW 15% เหลือ</span>
+    <span class="val" id="kWW">฿10,235.70</span>
+    <span class="sub">รายได้จริงที่ PNS ได้</span>
+  </div>
+  <div class="kpi red">
+    <span class="lbl">จ่ายผู้รับเหมาช่วง</span>
+    <span class="val" id="kSub">-฿2,636</span>
+    <span class="sub">ต้นทุน Outsource</span>
+  </div>
+  <div class="kpi green">
+    <span class="lbl">กำไรขั้นต้น / งาน</span>
+    <span class="val" id="kGP">฿7,599.70</span>
+    <span class="sub" id="kGPpct">74.25% ของ WW</span>
+  </div>
+</div>
+
+<!-- ============ TABLE: AU-by-AU ============ -->
+<div class="card" style="margin-bottom:20px">
+  <h2>เทียบราคา True / WW / ผู้รับเหมาช่วง <span class="badge cut">WW หัวคิว 15%</span></h2>
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>AU Code</th>
+        <th>รายการ</th>
+        <th>หน่วย</th>
+        <th class="num">Qty</th>
+        <th class="num">True<br><small style="font-weight:400">ราคาเต็ม</small></th>
+        <th class="num">WW (-15%)<br><small style="font-weight:400">หลังหักหัวคิว</small></th>
+        <th class="num">ผู้รับเหมาช่วง<br><small style="font-weight:400">(แก้ได้)</small></th>
+        <th class="num">กำไร/หน่วย</th>
+        <th class="num">รวม WW</th>
+        <th class="num">รวม จ่ายผรม</th>
+        <th class="num">กำไรรวม</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  </div>
+  <div class="note">
+    ข้อมูลจริงจาก Sheet "Decom" ของ FBOQ FTTX U6 – ราคาผู้รับเหมาช่วงในตารางต้นฉบับ:
+    รื้อสาย ฿2/M, รื้อตู้ ODF ฿200/EA, Splice 12C ฿100/EA, OTDR Service ฿2,000/Set, OSP Cutover ฿0 (ทำเอง)
+  </div>
+</div>
+
+<!-- ============ FIXED COST + MONTHLY ============ -->
+<div class="grid grid-2" style="margin-bottom:20px">
+  <div class="card">
+    <h2>Fixed Cost รายเดือน <span class="badge fix">พนักงาน PNS</span></h2>
+    <div class="input-row">
+      <label>พนักงานคนที่ 1<small>เดือนละ</small></label>
+      <input type="number" id="s1" value="18000" step="500">
+    </div>
+    <div class="input-row">
+      <label>พนักงานคนที่ 2<small>เดือนละ</small></label>
+      <input type="number" id="s2" value="18000" step="500">
+    </div>
+    <div class="summary-row tot">
+      <span>รวม Fixed Cost / เดือน</span>
+      <span id="fixedCost" style="color:var(--amber)">฿36,000</span>
+    </div>
+    <div class="note">ค่าใช้จ่ายประจำที่ต้องจ่ายไม่ว่าจะมีงานหรือไม่</div>
+  </div>
+
+  <div class="card">
+    <h2>ประมาณการรายเดือน <span class="badge profit">กำไรสุทธิ</span></h2>
+    <div class="input-row" style="margin-bottom:8px">
+      <label>จำนวนงาน Decom / เดือน</label>
+      <input type="number" id="jobs" value="20" step="1">
+    </div>
+    <div class="summary-row"><span>รายได้จาก WW</span><span id="mRev">฿204,714</span></div>
+    <div class="summary-row"><span>จ่ายผู้รับเหมาช่วง</span><span id="mSub" class="neg">-฿52,720</span></div>
+    <div class="summary-row"><span>กำไรขั้นต้น</span><span id="mGP" class="pos">฿151,994</span></div>
+    <div class="summary-row"><span>Fixed Cost (พนักงาน)</span><span id="mFix" class="neg">-฿36,000</span></div>
+    <div class="summary-row tot"><span>กำไรสุทธิ / เดือน</span><span id="mNet" class="pos">฿115,994</span></div>
+    <div class="summary-row" style="font-size:13px; color:var(--muted)">
+      <span>จุดคุ้มทุน (จำนวนงาน/เดือน)</span><span id="be">4.7 ใบ</span>
+    </div>
+    <div class="summary-row tot"><span>กำไรสุทธิ / ปี</span><span id="annual" class="pos">฿1,391,928</span></div>
+  </div>
+</div>
+
+<!-- ============ MARGIN HIGHLIGHT ============ -->
+<div class="card" style="margin-bottom:20px; text-align:center; background:linear-gradient(135deg,#f0fdf4,#dcfce7); border-color:#86efac">
+  <div class="section-title" style="color:#166534">% กำไรงาน Decom</div>
+  <div style="display:flex; justify-content:center; gap:60px; flex-wrap:wrap; align-items:end; margin-top:10px">
+    <div>
+      <div class="pct-big" id="pctOfTrue">63.11%</div>
+      <div class="pct-label">% กำไรขั้นต้น vs ราคา True เต็ม</div>
+    </div>
+    <div>
+      <div class="pct-big" id="pctOfWW" style="color:var(--primary)">74.25%</div>
+      <div class="pct-label">% กำไรขั้นต้น vs รายได้ WW (หลังหัก 15%)</div>
+    </div>
+    <div>
+      <div class="pct-big" id="pctNet" style="color:var(--amber)">56.66%</div>
+      <div class="pct-label">% กำไรสุทธิ (หลังหัก Fixed Cost)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHARTS ============ -->
+<div class="grid grid-2">
+  <div class="card">
+    <h2>กำไรรายรายการ (ต่อ 1 งาน)</h2>
+    <div class="chart-wrap"><canvas id="chart1"></canvas></div>
+  </div>
+  <div class="card">
+    <h2>Break-even Analysis</h2>
+    <div class="chart-wrap"><canvas id="chart2"></canvas></div>
+    <div class="note" id="beNote">ต้องรับงาน Decom เพียง <b>4.7 ใบ/เดือน</b> ก็คุ้ม Fixed Cost แล้ว</div>
+  </div>
+</div>
+
+<p style="text-align:center; color:var(--muted); font-size:12px; margin-top:24px">
+  ที่มาข้อมูล: FBOQ FTTX U6 (ชีท Decom) — โครงสร้างราคา TRUE → WW (-15%) → PNS → ผู้รับเหมาช่วง
+</p>
+
+</div>
+
+<script>
+// ===== Source data from Decom sheet =====
+// True = ราคาเต็ม, WW = True × 0.85 (หัก 15%), Sub = ราคาผู้รับเหมาช่วง
+const WW_CUT = 0.15;
+const items = [
+  {idx:1, code:'TPCHDWW008C', desc:'Remove OFC cable (Non-Usable) – กทม',  unit:'M',   qty:118, truePrice:3,    subPrice:2},
+  {idx:2, code:'TPCHDWW115C', desc:'Remove ODF Box – กทม',                   unit:'EA',  qty:1,   truePrice:450,  subPrice:200},
+  {idx:3, code:'TPCHDWW066C', desc:'Splice 1-12 cores per point – กทม',      unit:'EA',  qty:2,   truePrice:135,  subPrice:100},
+  {idx:4, code:'TPUHDWW136C', desc:'Service charge OTDR Test',                unit:'Set', qty:1,   truePrice:8000, subPrice:2000},
+  {idx:5, code:'TPUHDWW239C', desc:'OSP Cutover & Plan-work (ทำเอง)',          unit:'Set', qty:1,   truePrice:2968, subPrice:0},
+];
+
+const fmt   = n => '฿' + Math.round(n).toLocaleString('en-US');
+const fmt2  = n => '฿' + n.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
+const $ = id => document.getElementById(id);
+const val = id => Number($(id).value) || 0;
+let chart1, chart2;
+
+function buildTable(){
+  const tb = $('tbody');
+  tb.innerHTML = '';
+  items.forEach(it=>{
+    const wwPrice = it.truePrice * (1 - WW_CUT);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${it.idx}</td>
+      <td><code style="font-size:11px">${it.code}</code></td>
+      <td style="max-width:240px">${it.desc}</td>
+      <td>${it.unit}</td>
+      <td class="num">${it.qty.toLocaleString()}</td>
+      <td class="num">${it.truePrice.toLocaleString()}</td>
+      <td class="num">${wwPrice.toLocaleString('en-US',{maximumFractionDigits:2})}</td>
+      <td class="num"><input type="number" id="sub${it.idx}" value="${it.subPrice}" step="any"></td>
+      <td class="num pos" id="gpu${it.idx}"></td>
+      <td class="num" id="totWW${it.idx}"></td>
+      <td class="num neg" id="totSub${it.idx}"></td>
+      <td class="num pos" id="totGP${it.idx}"></td>`;
+    tb.appendChild(tr);
+  });
+  const tr = document.createElement('tr');
+  tr.className = 'total';
+  tr.innerHTML = `
+    <td colspan="9" style="text-align:right">รวม</td>
+    <td class="num" id="grandWW"></td>
+    <td class="num neg" id="grandSub"></td>
+    <td class="num pos" id="grandGP"></td>`;
+  tb.appendChild(tr);
+}
+
+function calc(){
+  let totTrue=0, totWW=0, totSub=0;
+  items.forEach(it=>{
+    const wwPrice = it.truePrice * (1 - WW_CUT);
+    const sub = Number($('sub'+it.idx).value) || 0;
+    const gpu = wwPrice - sub;
+    const tWW = wwPrice * it.qty;
+    const tSub = sub * it.qty;
+    const tGP = tWW - tSub;
+
+    $('gpu'+it.idx).textContent = gpu.toLocaleString('en-US',{maximumFractionDigits:2});
+    $('gpu'+it.idx).className = 'num ' + (gpu>=0?'pos':'neg');
+    $('totWW'+it.idx).textContent = fmt2(tWW);
+    $('totSub'+it.idx).textContent = '-' + fmt2(tSub);
+    $('totGP'+it.idx).textContent = (tGP>=0?'':'-') + fmt2(Math.abs(tGP));
+    $('totGP'+it.idx).className = 'num ' + (tGP>=0?'pos':'neg');
+
+    totTrue += it.truePrice * it.qty;
+    totWW += tWW;
+    totSub += tSub;
+  });
+  const totGP = totWW - totSub;
+
+  $('grandWW').textContent = fmt2(totWW);
+  $('grandSub').textContent = '-' + fmt2(totSub);
+  $('grandGP').textContent = (totGP>=0?'':'-') + fmt2(Math.abs(totGP));
+  $('grandGP').className = 'num ' + (totGP>=0?'pos':'neg');
+
+  $('kTrue').textContent = fmt(totTrue);
+  $('kWW').textContent = fmt2(totWW);
+  $('kSub').textContent = '-' + fmt2(totSub);
+  $('kGP').textContent = fmt2(totGP);
+  $('kGPpct').textContent = ((totGP/totWW)*100).toFixed(2) + '% ของ WW';
+
+  // Monthly
+  const fixed = val('s1') + val('s2');
+  const jobs = val('jobs');
+  const mRev = totWW * jobs;
+  const mSub = totSub * jobs;
+  const mGP = totGP * jobs;
+  const mNet = mGP - fixed;
+  const be = totGP > 0 ? fixed / totGP : Infinity;
+
+  $('fixedCost').textContent = fmt(fixed);
+  $('mRev').textContent = fmt2(mRev);
+  $('mSub').textContent = '-' + fmt2(mSub);
+  $('mGP').textContent = fmt2(mGP);
+  $('mFix').textContent = '-' + fmt(fixed);
+  $('mNet').textContent = (mNet>=0?'':'-') + fmt2(Math.abs(mNet));
+  $('mNet').className = mNet>=0?'pos':'neg';
+  $('annual').textContent = (mNet>=0?'':'-') + fmt(Math.abs(mNet*12));
+  $('annual').className = mNet>=0?'pos':'neg';
+  $('be').textContent = isFinite(be) ? be.toFixed(1) + ' ใบ' : '∞';
+
+  // Margins
+  $('pctOfTrue').textContent = ((totGP/totTrue)*100).toFixed(2) + '%';
+  $('pctOfWW').textContent = ((totGP/totWW)*100).toFixed(2) + '%';
+  $('pctNet').textContent = mRev>0 ? ((mNet/mRev)*100).toFixed(2) + '%' : '0%';
+
+  $('beNote').innerHTML = isFinite(be)
+    ? `ต้องรับงาน Decom เพียง <b>${be.toFixed(1)} ใบ/เดือน</b> ก็คุ้ม Fixed Cost แล้ว`
+    : `<b style="color:var(--red)">ราคา ผรม สูงกว่ารายได้ → ขาดทุน</b>`;
+
+  drawCharts(totWW, totSub, totGP, fixed, be);
+}
+
+function drawCharts(totWW, totSub, totGP, fixed, be){
+  // Chart 1: per-AU profit
+  const ctx1 = $('chart1').getContext('2d');
+  if(chart1) chart1.destroy();
+  const labels = items.map(i=>i.code);
+  const revs = items.map(i=>i.truePrice * (1-WW_CUT) * i.qty);
+  const subs = items.map(i=>(Number($('sub'+i.idx).value)||0) * i.qty);
+  const gps = revs.map((r,idx)=>r-subs[idx]);
+  chart1 = new Chart(ctx1,{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'รายได้ WW', data:revs, backgroundColor:'#16a34a'},
+      {label:'จ่าย ผู้รับเหมา', data:subs.map(c=>-c), backgroundColor:'#dc2626'},
+      {label:'กำไร', data:gps, backgroundColor:'#2563eb'}
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom', labels:{font:{family:'Sarabun'}}}},
+      scales:{
+        y:{ticks:{callback:v=>'฿'+(v/1000).toFixed(1)+'k', font:{family:'Sarabun'}}},
+        x:{ticks:{font:{family:'Sarabun', size:10}}}
+      }
+    }
+  });
+
+  // Chart 2: break-even
+  const ctx2 = $('chart2').getContext('2d');
+  if(chart2) chart2.destroy();
+  const lbl=[],revLine=[],totLine=[];
+  const maxJ = Math.max(20, Math.ceil((isFinite(be)?be:10)*3));
+  for(let j=0;j<=maxJ;j+=Math.max(1,Math.round(maxJ/20))){
+    lbl.push(j);
+    revLine.push(totWW*j);
+    totLine.push(fixed + totSub*j);
+  }
+  chart2 = new Chart(ctx2,{
+    type:'line',
+    data:{labels:lbl,datasets:[
+      {label:'รายได้ WW', data:revLine, borderColor:'#16a34a', backgroundColor:'rgba(22,163,74,.1)', tension:.05, fill:true},
+      {label:'ต้นทุนรวม (Fixed+ผรม)', data:totLine, borderColor:'#dc2626', backgroundColor:'rgba(220,38,38,.05)', tension:.05, fill:true}
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom', labels:{font:{family:'Sarabun'}}}},
+      scales:{
+        y:{ticks:{callback:v=>'฿'+(v/1000).toFixed(0)+'k', font:{family:'Sarabun'}}},
+        x:{title:{display:true, text:'จำนวนงาน/เดือน', font:{family:'Sarabun'}}, ticks:{font:{family:'Sarabun'}}}
+      }
+    }
+  });
+}
+
+buildTable();
+document.addEventListener('input', e=>{ if(e.target.tagName==='INPUT') calc(); });
+calc();
+</script>
+</body>
+</html>
