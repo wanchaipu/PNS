@@ -266,11 +266,11 @@
   </div>
 
   <!-- สรุป -->
-  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:8px">
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-top:8px">
     <div style="background:#fee2e2; border-radius:10px; padding:14px; text-align:center">
-      <div style="font-size:11px; color:#991b1b; font-weight:700; text-transform:uppercase; letter-spacing:.5px">ต้องสำรองจ่าย</div>
+      <div style="font-size:11px; color:#991b1b; font-weight:700; text-transform:uppercase; letter-spacing:.5px">สำรองจ่ายทันที</div>
       <div id="cfOut" style="font-size:22px; font-weight:800; color:#dc2626; margin-top:4px">฿...</div>
-      <div style="font-size:11px; color:#991b1b; margin-top:2px">ต่องาน (จ่ายทันที)</div>
+      <div style="font-size:11px; color:#991b1b; margin-top:2px">ค่าผู้รับเหมาช่วง</div>
     </div>
     <div style="background:#fef3c7; border-radius:10px; padding:14px; text-align:center">
       <div style="font-size:11px; color:#92400e; font-weight:700; text-transform:uppercase; letter-spacing:.5px">ระยะเวลารอ</div>
@@ -278,9 +278,14 @@
       <div style="font-size:11px; color:#92400e; margin-top:2px">ก่อนเบิกได้</div>
     </div>
     <div style="background:#dcfce7; border-radius:10px; padding:14px; text-align:center">
-      <div style="font-size:11px; color:#166534; font-weight:700; text-transform:uppercase; letter-spacing:.5px">รับกลับมา</div>
+      <div style="font-size:11px; color:#166534; font-weight:700; text-transform:uppercase; letter-spacing:.5px">รับจาก WW</div>
       <div id="cfIn" style="font-size:22px; font-weight:800; color:#16a34a; margin-top:4px">฿...</div>
-      <div style="font-size:11px; color:#166534; margin-top:2px">ต่องาน (รอ 6+ เดือน)</div>
+      <div style="font-size:11px; color:#166534; margin-top:2px">รอ 6+ เดือน</div>
+    </div>
+    <div style="background:#eff6ff; border-radius:10px; padding:14px; text-align:center; border:2px solid #bfdbfe">
+      <div style="font-size:11px; color:#1e40af; font-weight:700; text-transform:uppercase; letter-spacing:.5px">กำไรต่องาน</div>
+      <div id="cfProfit" style="font-size:22px; font-weight:800; color:#2563eb; margin-top:4px">฿...</div>
+      <div style="font-size:11px; color:#1e40af; margin-top:2px">หลังหัก WW 15%</div>
     </div>
   </div>
 </div>
@@ -411,10 +416,12 @@ function calc(){
     : `<b style="color:var(--red)">ราคา ผรม สูงกว่ารายได้ → ขาดทุน</b>`;
 
   // Cash flow
-  $('cfSub').textContent  = '-' + fmt(totSub);
-  $('cfWW').textContent   = fmt2(totWW);
-  $('cfOut').textContent  = '-' + fmt(totSub);
-  $('cfIn').textContent   = fmt2(totWW);
+  $('cfSub').textContent    = '-' + fmt(totSub);
+  $('cfWW').textContent     = fmt2(totWW);
+  $('cfOut').textContent    = '-' + fmt(totSub);
+  $('cfIn').textContent     = fmt2(totWW);
+  $('cfProfit').textContent = (totGP>=0?'':'-') + fmt(Math.abs(totGP));
+  $('cfProfit').style.color = totGP>=0 ? '#2563eb' : 'var(--red)';
 
   drawCharts(totWW, totSub, totGP, fixed, be);
 }
