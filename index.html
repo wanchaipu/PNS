@@ -124,7 +124,7 @@
     <thead>
       <tr>
         <th>#</th>
-        <th>AU Code</th>
+        <th>หมายเหตุ</th>
         <th>รายการ</th>
         <th>หน่วย</th>
         <th class="num">Qty</th>
@@ -220,11 +220,11 @@
 // True = ราคาเต็ม, WW = True × 0.85 (หัก 15%), Sub = ราคาผู้รับเหมาช่วง
 const WW_CUT = 0.15;
 const items = [
-  {idx:1, code:'TPUHDWW004C', desc:'Remove OFC cable (Non-Usable) – ต่างจังหวัด', unit:'M',   qty:118, truePrice:4,    subPrice:2},
-  {idx:2, code:'TPUHDWW115C', desc:'Remove ODF Box – ต่างจังหวัด',                 unit:'EA',  qty:1,   truePrice:450,  subPrice:200},
-  {idx:3, code:'TPUHDWW066C', desc:'Splice 1-12 cores per point – ต่างจังหวัด',    unit:'EA',  qty:2,   truePrice:135,  subPrice:100},
-  {idx:4, code:'TPUHDWW136C', desc:'Service charge OTDR Test',                      unit:'Set', qty:1,   truePrice:8000, subPrice:2000},
-  {idx:5, code:'TPUHDWW239C', desc:'OSP Cutover & Plan-work (ทำเอง)',               unit:'Set', qty:1,   truePrice:2968, subPrice:0},
+  {idx:1, remark:'รื้อสายในต่างจังหวัด',              desc:'Remove OFC cable (Non-Usable)', unit:'M',   qty:118, truePrice:4,    subPrice:2},
+  {idx:2, remark:'รื้อตู้ในต่างจังหวัด',               desc:'Remove ODF Box',                unit:'EA',  qty:1,   truePrice:450,  subPrice:200},
+  {idx:3, remark:'ค่าหา Core /TER ODF ในต่างจังหวัด', desc:'Splice 1-12 cores per point',   unit:'EA',  qty:2,   truePrice:135,  subPrice:100},
+  {idx:4, remark:'ตัดต่อ',                              desc:'Service charge OTDR Test',       unit:'Set', qty:1,   truePrice:8000, subPrice:2000},
+  {idx:5, remark:'หา Core MW',                          desc:'OSP Cutover & Plan-work (ทำเอง)', unit:'Set', qty:1,   truePrice:2968, subPrice:0},
 ];
 
 const fmt   = n => '฿' + Math.round(n).toLocaleString('en-US');
@@ -241,7 +241,7 @@ function buildTable(){
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${it.idx}</td>
-      <td><code style="font-size:11px">${it.code}</code></td>
+      <td style="max-width:160px">${it.remark}</td>
       <td style="max-width:240px">${it.desc}</td>
       <td>${it.unit}</td>
       <td class="num">${it.qty.toLocaleString()}</td>
