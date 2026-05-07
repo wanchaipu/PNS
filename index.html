@@ -184,21 +184,15 @@
 </div>
 
 <!-- ============ MARGIN HIGHLIGHT ============ -->
-<div class="card" style="margin-bottom:20px; text-align:center; background:linear-gradient(135deg,#f0fdf4,#dcfce7); border-color:#86efac">
-  <div class="section-title" style="color:#166534">% กำไรงาน Decom</div>
-  <div style="display:flex; justify-content:center; gap:60px; flex-wrap:wrap; align-items:end; margin-top:10px">
-    <div>
-      <div class="pct-big" id="pctOfTrue">63.11%</div>
-      <div class="pct-label">% กำไรขั้นต้น vs ราคา True เต็ม</div>
-    </div>
-    <div>
-      <div class="pct-big" id="pctOfWW" style="color:var(--primary)">74.25%</div>
-      <div class="pct-label">% กำไรขั้นต้น vs รายได้ WW (หลังหัก 15%)</div>
-    </div>
-    <div>
-      <div class="pct-big" id="pctNet" style="color:var(--amber)">56.66%</div>
-      <div class="pct-label">% กำไรสุทธิ (หลังหัก Fixed Cost)</div>
-    </div>
+<div class="card" style="margin-bottom:20px; text-align:center; background:linear-gradient(135deg,#f0fdf4,#dcfce7); border-color:#86efac; padding:32px">
+  <div class="section-title" style="color:#166534">กำไรที่ PNS ได้จริง (หักทุกอย่างแล้ว)</div>
+  <div style="margin-top:12px">
+    <div id="mNetBig" style="font-size:56px; font-weight:800; color:#16a34a; line-height:1">฿115,994</div>
+    <div style="font-size:16px; color:#166534; margin-top:8px; font-weight:600">กำไรสุทธิ / เดือน</div>
+  </div>
+  <div style="display:flex; justify-content:center; gap:48px; flex-wrap:wrap; margin-top:24px; font-size:15px; color:#166534">
+    <div><b id="kNetPerJob">฿5,800</b><span style="font-weight:400"> / งาน</span></div>
+    <div><b id="pctNet">56.66%</b><span style="font-weight:400"> ของรายได้ WW</span></div>
   </div>
 </div>
 
@@ -324,10 +318,14 @@ function calc(){
   $('annual').className = mNet>=0?'pos':'neg';
   $('be').textContent = isFinite(be) ? be.toFixed(1) + ' งาน' : '∞';
 
-  // Margins
-  $('pctOfTrue').textContent = ((totGP/totTrue)*100).toFixed(2) + '%';
-  $('pctOfWW').textContent = ((totGP/totWW)*100).toFixed(2) + '%';
+  // กำไรสุทธิที่ PNS ได้จริง
+  const netPerJob = jobs > 0 ? mNet / jobs : 0;
+  $('mNetBig').textContent = (mNet>=0?'':'-') + fmt(Math.abs(mNet));
+  $('mNetBig').style.color = mNet>=0 ? '#16a34a' : 'var(--red)';
+  $('kNetPerJob').textContent = (netPerJob>=0?'':'-') + fmt(Math.abs(netPerJob));
+  $('kNetPerJob').style.color = netPerJob>=0 ? '#166534' : 'var(--red)';
   $('pctNet').textContent = mRev>0 ? ((mNet/mRev)*100).toFixed(2) + '%' : '0%';
+  $('pctNet').style.color = mNet>=0 ? '#166534' : 'var(--red)';
 
   $('beNote').innerHTML = isFinite(be)
     ? `ต้องรับงาน Decom เพียง <b>${be.toFixed(1)} งาน/เดือน</b> ก็คุ้ม Fixed Cost แล้ว`
