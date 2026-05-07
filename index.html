@@ -38,15 +38,18 @@
   th,td{padding:9px 7px; text-align:left; border-bottom:1px solid var(--line); vertical-align:middle}
   th{background:#f8fafc; font-weight:700; color:var(--ink); font-size:11px; text-transform:uppercase; letter-spacing:.3px}
   td.num,th.num{text-align:right; font-variant-numeric:tabular-nums}
-  td input{width:90px; padding:6px 8px; text-align:right; border:1px solid var(--line); border-radius:6px; font-size:13px; font-variant-numeric:tabular-nums; font-family:inherit}
-  td input:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+  td input{width:90px; padding:6px 8px; text-align:right; border:2px solid var(--amber); border-radius:6px; font-size:13px; font-variant-numeric:tabular-nums; font-family:inherit; background:#fffbeb}
+  td input:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12); background:#fff}
+  .editable{display:inline-block; background:#fef3c7; color:#92400e; padding:1px 6px; border-radius:4px; font-size:11px; font-weight:600; margin-left:6px; border:1px solid #fde68a}
+  .legend{background:#fffbeb; border:1px solid #fde68a; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:13px; color:#92400e}
   tr.total td{font-weight:700; background:#f8fafc; border-top:2px solid var(--ink); font-size:14px}
   .pos{color:var(--green); font-weight:600}
   .neg{color:var(--red); font-weight:600}
   .input-row{display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--line)}
   .input-row label{font-size:14px}
   .input-row label small{display:block; color:var(--muted); font-size:12px}
-  .input-row input{width:120px; padding:7px 10px; text-align:right; border:1px solid var(--line); border-radius:8px; font-size:14px; font-variant-numeric:tabular-nums; font-family:inherit}
+  .input-row input{width:120px; padding:7px 10px; text-align:right; border:2px solid var(--amber); border-radius:8px; font-size:14px; font-variant-numeric:tabular-nums; font-family:inherit; background:#fffbeb}
+  .input-row input:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12); background:#fff}
   .kpi{display:flex; flex-direction:column; padding:16px; border-radius:10px; background:#f8fafc; border:1px solid var(--line)}
   .kpi .lbl{font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.5px}
   .kpi .val{font-size:22px; font-weight:700; margin-top:4px; font-variant-numeric:tabular-nums}
@@ -67,6 +70,10 @@
 </head>
 <body>
 <div class="wrap">
+
+<div class="legend">
+  <b>วิธีใช้:</b> ช่องที่มีกรอบสีเหลือง <span class="editable">&lt;แก้ได้&gt;</span> สามารถแก้ตัวเลขได้ — ระบบจะคำนวณกำไรใหม่ทันที
+</div>
 
 <header>
   <h1>PNS – Profit Calculator งาน Decom (จาก FBOQ FTTX U6)</h1>
@@ -123,7 +130,7 @@
         <th class="num">Qty</th>
         <th class="num">True<br><small style="font-weight:400">ราคาเต็ม</small></th>
         <th class="num">WW (-15%)<br><small style="font-weight:400">หลังหักหัวคิว</small></th>
-        <th class="num">ผู้รับเหมาช่วง<br><small style="font-weight:400">(แก้ได้)</small></th>
+        <th class="num">ผู้รับเหมาช่วง <span class="editable">&lt;แก้ได้&gt;</span></th>
         <th class="num">กำไร/หน่วย</th>
         <th class="num">รวม WW</th>
         <th class="num">รวม จ่ายผรม</th>
@@ -144,11 +151,11 @@
   <div class="card">
     <h2>Fixed Cost รายเดือน <span class="badge fix">พนักงาน PNS</span></h2>
     <div class="input-row">
-      <label>พนักงานคนที่ 1<small>เดือนละ</small></label>
+      <label>พนักงานคนที่ 1 <span class="editable">&lt;แก้ได้&gt;</span><small>เดือนละ</small></label>
       <input type="number" id="s1" value="18000" step="500">
     </div>
     <div class="input-row">
-      <label>พนักงานคนที่ 2<small>เดือนละ</small></label>
+      <label>พนักงานคนที่ 2 <span class="editable">&lt;แก้ได้&gt;</span><small>เดือนละ</small></label>
       <input type="number" id="s2" value="18000" step="500">
     </div>
     <div class="summary-row tot">
@@ -161,7 +168,7 @@
   <div class="card">
     <h2>ประมาณการรายเดือน <span class="badge profit">กำไรสุทธิ</span></h2>
     <div class="input-row" style="margin-bottom:8px">
-      <label>จำนวนงาน Decom / เดือน</label>
+      <label>จำนวนงาน Decom / เดือน <span class="editable">&lt;แก้ได้&gt;</span></label>
       <input type="number" id="jobs" value="20" step="1">
     </div>
     <div class="summary-row"><span>รายได้จาก WW</span><span id="mRev">฿204,714</span></div>
@@ -170,7 +177,7 @@
     <div class="summary-row"><span>Fixed Cost (พนักงาน)</span><span id="mFix" class="neg">-฿36,000</span></div>
     <div class="summary-row tot"><span>กำไรสุทธิ / เดือน</span><span id="mNet" class="pos">฿115,994</span></div>
     <div class="summary-row" style="font-size:13px; color:var(--muted)">
-      <span>จุดคุ้มทุน (จำนวนงาน/เดือน)</span><span id="be">4.7 ใบ</span>
+      <span>จุดคุ้มทุน (จำนวนงาน/เดือน)</span><span id="be">4.7 งาน</span>
     </div>
     <div class="summary-row tot"><span>กำไรสุทธิ / ปี</span><span id="annual" class="pos">฿1,391,928</span></div>
   </div>
@@ -221,7 +228,7 @@ const WW_CUT = 0.15;
 const items = [
   {idx:1, code:'TPCHDWW008C', desc:'Remove OFC cable (Non-Usable) – กทม',  unit:'M',   qty:118, truePrice:3,    subPrice:2},
   {idx:2, code:'TPCHDWW115C', desc:'Remove ODF Box – กทม',                   unit:'EA',  qty:1,   truePrice:450,  subPrice:200},
-  {idx:3, code:'TPCHDWW066C', desc:'Splice 1-12 cores per point – กทม',      unit:'EA',  qty:2,   truePrice:135,  subPrice:100},
+  {idx:3, code:'TPCHDWW066C', desc:'Splice 1-12 cores per point – กทม',      unit:'EA',  qty:2,   truePrice:155,  subPrice:100},
   {idx:4, code:'TPUHDWW136C', desc:'Service charge OTDR Test',                unit:'Set', qty:1,   truePrice:8000, subPrice:2000},
   {idx:5, code:'TPUHDWW239C', desc:'OSP Cutover & Plan-work (ทำเอง)',          unit:'Set', qty:1,   truePrice:2968, subPrice:0},
 ];
@@ -315,7 +322,7 @@ function calc(){
   $('mNet').className = mNet>=0?'pos':'neg';
   $('annual').textContent = (mNet>=0?'':'-') + fmt(Math.abs(mNet*12));
   $('annual').className = mNet>=0?'pos':'neg';
-  $('be').textContent = isFinite(be) ? be.toFixed(1) + ' ใบ' : '∞';
+  $('be').textContent = isFinite(be) ? be.toFixed(1) + ' งาน' : '∞';
 
   // Margins
   $('pctOfTrue').textContent = ((totGP/totTrue)*100).toFixed(2) + '%';
@@ -323,7 +330,7 @@ function calc(){
   $('pctNet').textContent = mRev>0 ? ((mNet/mRev)*100).toFixed(2) + '%' : '0%';
 
   $('beNote').innerHTML = isFinite(be)
-    ? `ต้องรับงาน Decom เพียง <b>${be.toFixed(1)} ใบ/เดือน</b> ก็คุ้ม Fixed Cost แล้ว`
+    ? `ต้องรับงาน Decom เพียง <b>${be.toFixed(1)} งาน/เดือน</b> ก็คุ้ม Fixed Cost แล้ว`
     : `<b style="color:var(--red)">ราคา ผรม สูงกว่ารายได้ → ขาดทุน</b>`;
 
   drawCharts(totWW, totSub, totGP, fixed, be);
