@@ -210,6 +210,81 @@
   </div>
 </div>
 
+<!-- ============ CASHFLOW RISK ============ -->
+<div class="card" style="margin-top:20px; border:2px solid #fca5a5; background:#fff7f7">
+  <h2 style="color:#991b1b">⚠️ ความเสี่ยงกระแสเงินสด (Cash Flow Gap)</h2>
+  <p style="font-size:14px; color:#7f1d1d; margin:0 0 20px">
+    งานเสร็จ → <b>จ่ายผู้รับเหมาทันที</b> แต่ยังเบิกเงินจาก WW ไม่ได้ — ต้องรอเอกสารเข้าระบบครบ ซึ่งใช้เวลา <b>6 เดือนขึ้นไป</b>
+  </p>
+
+  <!-- Timeline -->
+  <div style="position:relative; padding:0 16px; margin-bottom:24px">
+    <!-- เส้น -->
+    <div style="position:absolute; top:28px; left:60px; right:60px; height:4px; background:linear-gradient(90deg,#dc2626,#d97706,#16a34a); border-radius:2px"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative">
+      <!-- วันที่ 0 -->
+      <div style="text-align:center; width:120px">
+        <div style="width:20px; height:20px; border-radius:50%; background:#dc2626; border:3px solid #fff; box-shadow:0 0 0 2px #dc2626; margin:18px auto 10px"></div>
+        <div style="font-size:12px; font-weight:700; color:#dc2626">วันที่งานเสร็จ</div>
+        <div style="font-size:11px; color:#6b7a90; margin-top:4px">Day 0</div>
+        <div style="margin-top:10px; background:#fee2e2; border:1px solid #fca5a5; border-radius:8px; padding:8px; font-size:12px">
+          💸 <b>จ่ายผู้รับเหมา</b><br>
+          <span id="cfSub" style="color:#dc2626; font-weight:700; font-size:14px">฿...</span>
+        </div>
+      </div>
+
+      <!-- เดือน 1-2 -->
+      <div style="text-align:center; width:110px">
+        <div style="width:16px; height:16px; border-radius:50%; background:#d97706; border:3px solid #fff; box-shadow:0 0 0 2px #d97706; margin:20px auto 10px"></div>
+        <div style="font-size:12px; font-weight:700; color:#d97706">1–2 เดือน</div>
+        <div style="margin-top:10px; background:#fef3c7; border:1px solid #fde68a; border-radius:8px; padding:8px; font-size:12px">
+          📋 ส่งเอกสาร<br>รอ Verify
+        </div>
+      </div>
+
+      <!-- เดือน 3-5 -->
+      <div style="text-align:center; width:110px">
+        <div style="width:16px; height:16px; border-radius:50%; background:#d97706; border:3px solid #fff; box-shadow:0 0 0 2px #d97706; margin:20px auto 10px"></div>
+        <div style="font-size:12px; font-weight:700; color:#d97706">3–5 เดือน</div>
+        <div style="margin-top:10px; background:#fef3c7; border:1px solid #fde68a; border-radius:8px; padding:8px; font-size:12px">
+          🔄 รออนุมัติ<br>เข้าระบบ
+        </div>
+      </div>
+
+      <!-- 6+ เดือน -->
+      <div style="text-align:center; width:120px">
+        <div style="width:20px; height:20px; border-radius:50%; background:#16a34a; border:3px solid #fff; box-shadow:0 0 0 2px #16a34a; margin:18px auto 10px"></div>
+        <div style="font-size:12px; font-weight:700; color:#16a34a">6+ เดือน</div>
+        <div style="font-size:11px; color:#6b7a90; margin-top:4px">ถึงรับเงินได้</div>
+        <div style="margin-top:10px; background:#dcfce7; border:1px solid #86efac; border-radius:8px; padding:8px; font-size:12px">
+          ✅ <b>รับจาก WW</b><br>
+          <span id="cfWW" style="color:#16a34a; font-weight:700; font-size:14px">฿...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- สรุป -->
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:8px">
+    <div style="background:#fee2e2; border-radius:10px; padding:14px; text-align:center">
+      <div style="font-size:11px; color:#991b1b; font-weight:700; text-transform:uppercase; letter-spacing:.5px">ต้องสำรองจ่าย</div>
+      <div id="cfOut" style="font-size:22px; font-weight:800; color:#dc2626; margin-top:4px">฿...</div>
+      <div style="font-size:11px; color:#991b1b; margin-top:2px">ต่องาน (จ่ายทันที)</div>
+    </div>
+    <div style="background:#fef3c7; border-radius:10px; padding:14px; text-align:center">
+      <div style="font-size:11px; color:#92400e; font-weight:700; text-transform:uppercase; letter-spacing:.5px">ระยะเวลารอ</div>
+      <div style="font-size:22px; font-weight:800; color:#d97706; margin-top:4px">6+ เดือน</div>
+      <div style="font-size:11px; color:#92400e; margin-top:2px">ก่อนเบิกได้</div>
+    </div>
+    <div style="background:#dcfce7; border-radius:10px; padding:14px; text-align:center">
+      <div style="font-size:11px; color:#166534; font-weight:700; text-transform:uppercase; letter-spacing:.5px">รับกลับมา</div>
+      <div id="cfIn" style="font-size:22px; font-weight:800; color:#16a34a; margin-top:4px">฿...</div>
+      <div style="font-size:11px; color:#166534; margin-top:2px">ต่องาน (รอ 6+ เดือน)</div>
+    </div>
+  </div>
+</div>
+
 <p style="text-align:center; color:var(--muted); font-size:12px; margin-top:24px">
   ที่มาข้อมูล: FBOQ FTTX U6 (ชีท Decom) — โครงสร้างราคา TRUE → WW (-15%) → PNS → ผู้รับเหมาช่วง
 </p>
@@ -333,6 +408,12 @@ function calc(){
   $('beNote').innerHTML = isFinite(be)
     ? `ต้องรับงาน Decom เพียง <b>${be.toFixed(1)} งาน/เดือน</b> ก็คุ้ม Fixed Cost แล้ว`
     : `<b style="color:var(--red)">ราคา ผรม สูงกว่ารายได้ → ขาดทุน</b>`;
+
+  // Cash flow
+  $('cfSub').textContent  = '-' + fmt(totSub);
+  $('cfWW').textContent   = fmt2(totWW);
+  $('cfOut').textContent  = '-' + fmt(totSub);
+  $('cfIn').textContent   = fmt2(totWW);
 
   drawCharts(totWW, totSub, totGP, fixed, be);
 }
