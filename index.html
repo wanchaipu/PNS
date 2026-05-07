@@ -128,10 +128,10 @@
         <th>หมายเหตุ</th>
         <th>รายการ</th>
         <th>หน่วย</th>
-        <th class="num">Qty</th>
+        <th class="num">Qty <span class="editable">&lt;แก้ได้&gt;</span></th>
         <th class="num">True<br><small style="font-weight:400">ราคาเต็ม</small></th>
         <th class="num">WW (-15%)<br><small style="font-weight:400">หลังหักหัวคิว</small></th>
-        <th class="num">ผู้รับเหมาช่วง <span class="editable">&lt;แก้ได้&gt;</span></th>
+        <th class="num">ผู้รับเหมาช่วง</th>
         <th class="num">กำไร/หน่วย</th>
         <th class="num">รวม WW</th>
         <th class="num">รวม จ่ายผรม</th>
@@ -322,10 +322,10 @@ function buildTable(){
       <td style="max-width:160px">${it.remark}</td>
       <td style="max-width:240px">${it.desc}</td>
       <td>${it.unit}</td>
-      <td class="num">${it.qty.toLocaleString()}</td>
+      <td class="num"><input type="number" id="qty${it.idx}" value="${it.qty}" step="1" min="0" style="width:70px"></td>
       <td class="num">${it.truePrice.toLocaleString()}</td>
       <td class="num">${wwPrice.toLocaleString('en-US',{maximumFractionDigits:2})}</td>
-      <td class="num"><input type="number" id="sub${it.idx}" value="${it.subPrice}" step="any"></td>
+      <td class="num">${it.subPrice.toLocaleString()}</td>
       <td class="num pos" id="gpu${it.idx}"></td>
       <td class="num" id="totWW${it.idx}"></td>
       <td class="num neg" id="totSub${it.idx}"></td>
@@ -346,10 +346,11 @@ function calc(){
   let totTrue=0, totWW=0, totSub=0;
   items.forEach(it=>{
     const wwPrice = it.truePrice * (1 - WW_CUT);
-    const sub = Number($('sub'+it.idx).value) || 0;
+    const qty = Number($('qty'+it.idx).value) || 0;
+    const sub = it.subPrice;
     const gpu = wwPrice - sub;
-    const tWW = wwPrice * it.qty;
-    const tSub = sub * it.qty;
+    const tWW = wwPrice * qty;
+    const tSub = sub * qty;
     const tGP = tWW - tSub;
 
     $('gpu'+it.idx).textContent = gpu.toLocaleString('en-US',{maximumFractionDigits:2});
@@ -359,7 +360,7 @@ function calc(){
     $('totGP'+it.idx).textContent = (tGP>=0?'':'-') + fmt2(Math.abs(tGP));
     $('totGP'+it.idx).className = 'num ' + (tGP>=0?'pos':'neg');
 
-    totTrue += it.truePrice * it.qty;
+    totTrue += it.truePrice * qty;
     totWW += tWW;
     totSub += tSub;
   });
@@ -423,8 +424,8 @@ function drawCharts(totWW, totSub, totGP, fixed, be){
   const ctx1 = $('chart1').getContext('2d');
   if(chart1) chart1.destroy();
   const labels = items.map(i=>i.remark);
-  const revs = items.map(i=>i.truePrice * (1-WW_CUT) * i.qty);
-  const subs = items.map(i=>(Number($('sub'+i.idx).value)||0) * i.qty);
+  const revs = items.map(i=>i.truePrice * (1-WW_CUT) * (Number($('qty'+i.idx).value)||0));
+  const subs = items.map(i=>i.subPrice * (Number($('qty'+i.idx).value)||0));
   const gps = revs.map((r,idx)=>r-subs[idx]);
   const barColors = gps.map(g=>g>=0?'rgba(22,163,74,.8)':'rgba(220,38,38,.8)');
   chart1 = new Chart(ctx1,{
