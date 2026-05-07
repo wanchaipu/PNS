@@ -62,7 +62,8 @@
   .summary-row{display:flex; justify-content:space-between; padding:6px 0; font-size:14px}
   .summary-row.tot{border-top:1px solid var(--line); padding-top:10px; margin-top:8px; font-weight:700; font-size:15px}
   .note{font-size:12px; color:var(--muted); margin-top:12px; padding:10px 12px; background:#f8fafc; border-left:3px solid var(--primary); border-radius:6px}
-  .chart-wrap{position:relative; height:280px; margin-top:10px}
+  .chart-wrap{position:relative; height:320px; margin-top:10px}
+  .chart-wrap.tall{height:360px}
   .section-title{font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin:0 0 8px; font-weight:700}
   .pct-big{font-size:48px; font-weight:800; color:var(--green); line-height:1}
   .pct-label{font-size:13px; color:var(--muted); margin-top:6px; font-weight:600}
@@ -200,7 +201,7 @@
 <div class="grid grid-2">
   <div class="card">
     <h2>กำไรรายรายการ (ต่อ 1 งาน)</h2>
-    <div class="chart-wrap"><canvas id="chart1"></canvas></div>
+    <div class="chart-wrap tall"><canvas id="chart1"></canvas></div>
   </div>
   <div class="card">
     <h2>Break-even Analysis</h2>
@@ -337,26 +338,33 @@ function calc(){
 }
 
 function drawCharts(totWW, totSub, totGP, fixed, be){
-  // Chart 1: per-AU profit
+  // Chart 1: กำไรต่อรายการ (horizontal)
   const ctx1 = $('chart1').getContext('2d');
   if(chart1) chart1.destroy();
   const labels = items.map(i=>i.remark);
   const revs = items.map(i=>i.truePrice * (1-WW_CUT) * i.qty);
   const subs = items.map(i=>(Number($('sub'+i.idx).value)||0) * i.qty);
   const gps = revs.map((r,idx)=>r-subs[idx]);
+  const barColors = gps.map(g=>g>=0?'rgba(22,163,74,.8)':'rgba(220,38,38,.8)');
   chart1 = new Chart(ctx1,{
     type:'bar',
-    data:{labels,datasets:[
-      {label:'รายได้ WW', data:revs, backgroundColor:'#16a34a'},
-      {label:'จ่าย ผู้รับเหมา', data:subs.map(c=>-c), backgroundColor:'#dc2626'},
-      {label:'กำไร', data:gps, backgroundColor:'#2563eb'}
-    ]},
+    data:{labels, datasets:[{
+      label:'กำไร (บ.)',
+      data:gps,
+      backgroundColor:barColors,
+      borderRadius:6,
+      borderSkipped:false,
+    }]},
     options:{
+      indexAxis:'y',
       responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom', labels:{font:{family:'Sarabun'}}}},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:v=>'฿'+Math.round(v.raw).toLocaleString('en-US')}}
+      },
       scales:{
-        y:{ticks:{callback:v=>'฿'+(v/1000).toFixed(1)+'k', font:{family:'Sarabun'}}},
-        x:{ticks:{font:{family:'Sarabun', size:10}}}
+        x:{ticks:{callback:v=>'฿'+(v/1000).toFixed(1)+'k', font:{family:'Sarabun', size:11}}, grid:{color:'#f0f0f0'}},
+        y:{ticks:{font:{family:'Sarabun', size:12}}}
       }
     }
   });
