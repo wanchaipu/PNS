@@ -120,7 +120,7 @@
   <div style="overflow-x:auto">
   <table>
     <thead><tr>
-      <th>#</th><th>หมายเหตุ</th><th>รายการ</th><th>หน่วย</th>
+      <th>#</th><th>หมายเหตุ</th><th>หน่วย</th>
       <th class="num">Qty <span class="editable">&lt;แก้ได้&gt;</span></th>
       <th class="num">True<br><small style="font-weight:400">ราคาเต็ม</small></th>
       <th class="num">WW (-15%)<br><small style="font-weight:400">หลังหักหัวคิว</small></th>
@@ -233,7 +233,7 @@
   <div style="overflow-x:auto">
   <table>
     <thead><tr>
-      <th>#</th><th>หมายเหตุ</th><th>รายการ</th><th>หน่วย</th>
+      <th>#</th><th>หมายเหตุ</th><th>หน่วย</th>
       <th class="num">Qty <span class="editable">&lt;แก้ได้&gt;</span></th>
       <th class="num">True<br><small style="font-weight:400">ราคาเต็ม</small></th>
       <th class="num">WW (-15%)<br><small style="font-weight:400">หลังหักหัวคิว</small></th>
@@ -246,7 +246,7 @@
     <tbody id="f_tbody"></tbody>
   </table>
   </div>
-  <div class="note">ข้อมูลจริงจาก Sheet "FTTX" ของ FBOQ FTTX U6 – พื้นที่ต่างจังหวัด – ราคาผู้รับเหมาช่วง: L1 Bare 1:8 ฿750/EA, L2+TestE2E ฿1,000/Set, Design ฿0.60/M, Splice &lt;12F ฿800/Set, เดินสาย Aerial ฿8/M &nbsp;|&nbsp; ⚠️ L1 Bare 1:8: WW ต่ำกว่าต้นทุน ผรม (GP ติดลบ)</div>
+  <div class="note">ข้อมูลจากชีท "ตัวอย่างรับงาน 1 site FTTX" ของ FBOQ FTTX U6 – ราคาผู้รับเหมาช่วง: เดินสาย ฿7.20/M, Splice L2 ฿1,000/EA, Ter ODF ฿800/Set, Closure ฿490/EA, L2 Box ฿156/EA, Design ฿0.60/M &nbsp;|&nbsp; ⚠️ Closure และ L2 Box: WW ต่ำกว่าต้นทุน ผรม (GP ติดลบ)</div>
 </div>
 
 <div class="grid grid-2" style="margin-bottom:20px">
@@ -334,36 +334,26 @@ function switchTab(name){
   document.querySelector(`.tab-btn[data-tab="${name}"]`).classList.add('active');
 }
 
-// ══════════════ DECOM DATA ══════════════
+// ══════════════ DECOM DATA (ตัวอย่างรับงาน 1 site Decom) ══════════════
 const decomItems = [
-  {idx:1, remark:'รื้อสาย',                desc:'Remove OFC cable (Non-Usable)',  unit:'M',   qty:118, truePrice:3,    subPrice:2},
-  {idx:2, remark:'รื้อตู้',                desc:'Remove ODF Box',                 unit:'EA',  qty:2,   truePrice:450,  subPrice:200},
-  {idx:3, remark:'ค่าหาCore ละ /TER ODF', desc:'1-12 cores per point',            unit:'EA',  qty:2,   truePrice:135,  subPrice:100},
-  {idx:4, remark:'ตัดต่อ',                 desc:'Service charge OTDR Test',        unit:'Set', qty:1,   truePrice:8000, subPrice:2000},
-  {idx:5, remark:'หา Core MW',             desc:'OSP Cutover & Plan-work (ทำเอง)', unit:'Set', qty:1,   truePrice:2968, subPrice:0},
-  {idx:6, remark:'ทำเล่ม',                 desc:'จัดทำรายงาน',                    unit:'Set', qty:1,   truePrice:0,    subPrice:500},
-  {idx:7, remark:'ทำ LLD',                 desc:'จัดทำ LLD',                       unit:'Set', qty:1,   truePrice:0,    subPrice:500},
+  {idx:1, remark:'รื้อสาย',              unit:'M',   qty:118, truePrice:3,    subPrice:2},
+  {idx:2, remark:'รื้อตู้',              unit:'EA',  qty:2,   truePrice:450,  subPrice:200},
+  {idx:3, remark:'ค่าหาCore /TER ODF',  unit:'EA',  qty:2,   truePrice:135,  subPrice:100},
+  {idx:4, remark:'ตัดต่อ',               unit:'Set', qty:1,   truePrice:8000, subPrice:2000},
+  {idx:5, remark:'หา Core MW',           unit:'Set', qty:1,   truePrice:2968, subPrice:0},
+  {idx:6, remark:'ทำเล่ม',               unit:'Set', qty:0,   truePrice:0,    subPrice:500},
+  {idx:7, remark:'ทำ LLD',               unit:'Set', qty:0,   truePrice:0,    subPrice:500},
 ];
 
-// ══════════════ FTTX DATA ══════════════
+// ══════════════ FTTX DATA (ตัวอย่างรับงาน 1 site FTTX) ══════════════
 const fttxItems = [
-  // ── สายและการเดินสาย (qty=0 ถ้าไม่ต้องเดินสายใหม่) ──
-  {idx:1,  remark:'สาย ADSS-FR 12C',       desc:'Supply OF Cable ADSS-FR Armor 12C (เริ่ม 1-04-2025)',     unit:'M',   qty:0,    truePrice:9.94,    subPrice:7.50},
-  {idx:2,  remark:'ค่าจัดการสาย 12C',     desc:'Management Fee OF Cable ADSS-FR Armor 12C',               unit:'M',   qty:0,    truePrice:0.64,    subPrice:0},
-  {idx:3,  remark:'เดินสาย Aerial',        desc:'Installation Service OFC Aerial (ต่างจังหวัด)',           unit:'M',   qty:0,    truePrice:14.50,   subPrice:8.00},
-  // ── L1 ──
-  {idx:4,  remark:'ติดตั้ง L1 Closure',   desc:'Installation Inline & L1 Closure (12-48 cores)',           unit:'EA',  qty:0,    truePrice:192.33,  subPrice:0},
-  {idx:5,  remark:'Supply L1 Closure',     desc:'Supply Inline & L1 Closure (12-48 cores)',                 unit:'EA',  qty:1,    truePrice:496.80,  subPrice:0},
-  {idx:6,  remark:'L1 Bare 1:8 ⚠️',       desc:'L1 Bare Splitter 1:8 (MDU+SDU) — WW < ต้นทุน ผรม',      unit:'EA',  qty:1,    truePrice:117.72,  subPrice:750},
-  // ── Splice แยก (ใช้เมื่อไม่รวมใน L2+Test) ──
-  {idx:7,  remark:'Splice <12F (แยก)',     desc:'Splicing OF-Cable Aerial/UG <12 Fibers (กรณีแยก)',        unit:'Set', qty:0,    truePrice:1923.30, subPrice:800},
-  // ── L2 ──
-  {idx:8,  remark:'L2 Closure Splitter',   desc:'L2 Closure Splitter (SDU)',                                unit:'EA',  qty:1,    truePrice:426.60,  subPrice:0},
-  {idx:9,  remark:'L2 Box Splitter 1:8',   desc:'L2 Box Splitter included Splitter 1:8 (MDU+SDU)',         unit:'EA',  qty:1,    truePrice:117.34,  subPrice:0},
-  {idx:10, remark:'L2 Install+Splice+Test',desc:'Install+Splice L2+TestE2E (FTTX)',                         unit:'Set', qty:1,    truePrice:1250.15, subPrice:1000},
-  // ── อื่นๆ ──
-  {idx:11, remark:'ค่าขนส่งสาย',          desc:'ค่าขนส่ง OF Cable (คำนวณจาก Installation Cost)',         unit:'M',   qty:1000, truePrice:0.13,    subPrice:0},
-  {idx:12, remark:'ออกแบบ (QRUN)',         desc:'Design by QRUN (≤1000M)',                                  unit:'M',   qty:1000, truePrice:1.30,    subPrice:0.60},
+  {idx:1, remark:'เดินสาย 12c',  unit:'M',   qty:399,    truePrice:13.03,   subPrice:7.20},
+  {idx:3, remark:'ค่าขนสาย',     unit:'M',   qty:399,    truePrice:0.30,    subPrice:0},
+  {idx:4, remark:'Splice L2',     unit:'EA',  qty:2,      truePrice:1265.75, subPrice:1000},
+  {idx:5, remark:'Ter ODF',       unit:'Set', qty:2,      truePrice:1947.30, subPrice:800},
+  {idx:6, remark:'ค่า Closure',   unit:'EA',  qty:2,      truePrice:426.60,  subPrice:490},
+  {idx:7, remark:'ค่า L2 Box',    unit:'EA',  qty:2,      truePrice:117.34,  subPrice:156},
+  {idx:8, remark:'เขียน Edsign', unit:'M',   qty:336.63, truePrice:1.11,    subPrice:0.60},
 ];
 
 // ══════════════ SHARED BUILDERS ══════════════
@@ -378,10 +368,9 @@ function buildTable(items, tbodyId, prefix){
     if(isNeg) tr.className = 'warn-row';
     tr.innerHTML = `
       <td>${it.idx}</td>
-      <td style="max-width:140px">${it.remark}</td>
-      <td style="max-width:260px;font-size:12px">${it.desc}</td>
+      <td>${it.remark}</td>
       <td>${it.unit}</td>
-      <td class="num"><input type="number" id="${prefix}qty${it.idx}" value="${it.qty}" step="1" min="0" style="width:70px"></td>
+      <td class="num"><input type="number" id="${prefix}qty${it.idx}" value="${it.qty}" step="any" min="0" style="width:70px"></td>
       <td class="num">${it.truePrice.toLocaleString('en-US',{maximumFractionDigits:2})}</td>
       <td class="num">${wwPrice.toLocaleString('en-US',{maximumFractionDigits:2})}</td>
       <td class="num">${it.subPrice.toLocaleString('en-US',{maximumFractionDigits:2})}</td>
@@ -393,7 +382,7 @@ function buildTable(items, tbodyId, prefix){
   });
   const tr = document.createElement('tr');
   tr.className = 'total';
-  tr.innerHTML = `<td colspan="9" style="text-align:right">รวม</td>
+  tr.innerHTML = `<td colspan="8" style="text-align:right">รวม</td>
     <td class="num" id="${prefix}grandWW"></td>
     <td class="num neg" id="${prefix}grandSub"></td>
     <td class="num" id="${prefix}grandGP"></td>`;
