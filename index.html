@@ -162,6 +162,7 @@
   <div style="margin-top:12px">
     <div id="d_mNetBig" style="font-size:56px; font-weight:800; color:#16a34a; line-height:1">-</div>
     <div style="font-size:16px; color:#166534; margin-top:8px; font-weight:600">กำไรสุทธิ / เดือน</div>
+    <div style="font-size:13px; color:#166534; margin-top:4px; opacity:.75">คำนวณที่จำนวนงาน <b id="d_jobsLabel">20</b> งาน / เดือน</div>
   </div>
   <div style="display:flex; justify-content:center; gap:48px; flex-wrap:wrap; margin-top:24px; font-size:15px; color:#166534">
     <div><b id="d_kNetPerJob">-</b><span style="font-weight:400"> / งาน</span></div>
@@ -177,25 +178,58 @@
 <div class="card" style="border:2px solid #fca5a5; background:#fff7f7">
   <h2 style="color:#991b1b">⚠️ ความเสี่ยงกระแสเงินสด (Cash Flow Gap)</h2>
   <p style="font-size:14px; color:#7f1d1d; margin:0 0 20px">งานเสร็จ → <b>จ่ายผู้รับเหมาทันที</b> แต่ยังเบิกเงินจาก WW ไม่ได้ — ต้องรอเอกสารเข้าระบบครบ ซึ่งใช้เวลา <b>6 เดือนขึ้นไป</b></p>
-  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px">
+
+  <!-- ── Timeline ── -->
+  <div style="text-align:center; margin-bottom:16px">
+    <span style="background:#fef3c7; border:1px solid #fde68a; border-radius:999px; padding:5px 18px; font-size:12px; font-weight:700; color:#92400e">⏳ ช่วงรอ 6+ เดือน — เงินค้างไม่ได้รับ</span>
+  </div>
+  <!-- dots + bar -->
+  <div style="position:relative; display:flex; align-items:center; justify-content:space-between; padding:0 8px; margin-bottom:10px">
+    <div style="position:absolute; left:44px; right:44px; height:5px; background:linear-gradient(90deg,#dc2626,#f97316 25%,#eab308 55%,#22c55e); border-radius:3px; z-index:0"></div>
+    <div style="z-index:1; width:28px; height:28px; background:#dc2626; border-radius:50%; border:3px solid #fff7f7; box-shadow:0 0 0 2px #dc2626; flex-shrink:0"></div>
+    <div style="z-index:1; width:11px; height:11px; background:#fca5a5; border-radius:50%; flex-shrink:0"></div>
+    <div style="z-index:1; width:11px; height:11px; background:#fdba74; border-radius:50%; flex-shrink:0"></div>
+    <div style="z-index:1; width:11px; height:11px; background:#fef08a; border-radius:50%; flex-shrink:0"></div>
+    <div style="z-index:1; width:11px; height:11px; background:#d9f99d; border-radius:50%; flex-shrink:0"></div>
+    <div style="z-index:1; width:11px; height:11px; background:#86efac; border-radius:50%; flex-shrink:0"></div>
+    <div style="z-index:1; width:28px; height:28px; background:#16a34a; border-radius:50%; border:3px solid #fff7f7; box-shadow:0 0 0 2px #16a34a; flex-shrink:0"></div>
+  </div>
+  <!-- labels below dots -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding:0 2px">
+    <div style="text-align:center; width:80px">
+      <div style="font-size:10px; color:#991b1b; font-weight:700">เดือนที่ 0</div>
+      <div style="font-size:10px; color:#7f1d1d">จ่าย ผรม</div>
+      <div id="d_cfOut" style="font-size:15px; font-weight:800; color:#dc2626; margin-top:3px">-</div>
+    </div>
+    <div style="display:flex; justify-content:space-around; flex:1; padding-top:1px">
+      <div style="font-size:10px; color:#9ca3af; text-align:center">1</div>
+      <div style="font-size:10px; color:#9ca3af; text-align:center">2</div>
+      <div style="font-size:10px; color:#9ca3af; text-align:center">3</div>
+      <div style="font-size:10px; color:#9ca3af; text-align:center">4</div>
+      <div style="font-size:10px; color:#9ca3af; text-align:center">5</div>
+    </div>
+    <div style="text-align:center; width:80px">
+      <div style="font-size:10px; color:#166534; font-weight:700">เดือนที่ 6+</div>
+      <div style="font-size:10px; color:#14532d">รับจาก WW</div>
+      <div id="d_cfIn" style="font-size:15px; font-weight:800; color:#16a34a; margin-top:3px">-</div>
+    </div>
+  </div>
+
+  <!-- summary boxes -->
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px">
     <div style="background:#fee2e2; border-radius:10px; padding:14px; text-align:center">
       <div style="font-size:11px; color:#991b1b; font-weight:700; text-transform:uppercase; letter-spacing:.5px">สำรองจ่ายทันที</div>
-      <div id="d_cfOut" style="font-size:22px; font-weight:800; color:#dc2626; margin-top:4px">-</div>
+      <div id="d_cfOutBox" style="font-size:20px; font-weight:800; color:#dc2626; margin-top:4px">-</div>
       <div style="font-size:11px; color:#991b1b; margin-top:2px">ค่าผู้รับเหมาช่วง</div>
     </div>
     <div style="background:#fef3c7; border-radius:10px; padding:14px; text-align:center">
       <div style="font-size:11px; color:#92400e; font-weight:700; text-transform:uppercase; letter-spacing:.5px">ระยะเวลารอ</div>
-      <div style="font-size:22px; font-weight:800; color:#d97706; margin-top:4px">6+ เดือน</div>
+      <div style="font-size:20px; font-weight:800; color:#d97706; margin-top:4px">6+ เดือน</div>
       <div style="font-size:11px; color:#92400e; margin-top:2px">ก่อนเบิกได้</div>
-    </div>
-    <div style="background:#dcfce7; border-radius:10px; padding:14px; text-align:center">
-      <div style="font-size:11px; color:#166534; font-weight:700; text-transform:uppercase; letter-spacing:.5px">รับจาก WW</div>
-      <div id="d_cfIn" style="font-size:22px; font-weight:800; color:#16a34a; margin-top:4px">-</div>
-      <div style="font-size:11px; color:#166534; margin-top:2px">รอ 6+ เดือน</div>
     </div>
     <div style="background:#eff6ff; border-radius:10px; padding:14px; text-align:center; border:2px solid #bfdbfe">
       <div style="font-size:11px; color:#1e40af; font-weight:700; text-transform:uppercase; letter-spacing:.5px">กำไรต่องาน</div>
-      <div id="d_cfProfit" style="font-size:22px; font-weight:800; color:#2563eb; margin-top:4px">-</div>
+      <div id="d_cfProfit" style="font-size:20px; font-weight:800; color:#2563eb; margin-top:4px">-</div>
       <div style="font-size:11px; color:#1e40af; margin-top:2px">หลังหัก WW 15%</div>
     </div>
   </div>
@@ -275,6 +309,7 @@
   <div style="margin-top:12px">
     <div id="f_mNetBig" style="font-size:56px; font-weight:800; color:#16a34a; line-height:1">-</div>
     <div style="font-size:16px; color:#166534; margin-top:8px; font-weight:600">กำไรสุทธิ / เดือน</div>
+    <div style="font-size:13px; color:#166534; margin-top:4px; opacity:.75">คำนวณที่จำนวนงาน <b id="f_jobsLabel">20</b> งาน / เดือน</div>
   </div>
   <div style="display:flex; justify-content:center; gap:48px; flex-wrap:wrap; margin-top:24px; font-size:15px; color:#166534">
     <div><b id="f_kNetPerJob">-</b><span style="font-weight:400"> / งาน</span></div>
@@ -290,25 +325,58 @@
 <div class="card" style="border:2px solid #fca5a5; background:#fff7f7">
   <h2 style="color:#991b1b">⚠️ ความเสี่ยงกระแสเงินสด (Cash Flow Gap)</h2>
   <p style="font-size:14px; color:#7f1d1d; margin:0 0 20px">งานเสร็จ → <b>จ่ายผู้รับเหมาทันที</b> แต่ยังเบิกเงินจาก WW ไม่ได้ — ต้องรอเอกสารเข้าระบบครบ ซึ่งใช้เวลา <b>6 เดือนขึ้นไป</b></p>
-  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px">
+
+  <!-- ── Timeline ── -->
+  <div style="text-align:center; margin-bottom:16px">
+    <span style="background:#fef3c7; border:1px solid #fde68a; border-radius:999px; padding:5px 18px; font-size:12px; font-weight:700; color:#92400e">⏳ ช่วงรอ 6+ เดือน — เงินค้างไม่ได้รับ</span>
+  </div>
+  <!-- dots + bar -->
+  <div style="position:relative; display:flex; align-items:center; justify-content:space-between; padding:0 8px; margin-bottom:10px">
+    <div style="position:absolute; left:44px; right:44px; height:5px; background:linear-gradient(90deg,#dc2626,#f97316 25%,#eab308 55%,#22c55e); border-radius:3px; z-index:0"></div>
+    <div style="z-index:1; width:28px; height:28px; background:#dc2626; border-radius:50%; border:3px solid #fff7f7; box-shadow:0 0 0 2px #dc2626; flex-shrink:0"></div>
+    <div style="z-index:1; width:11px; height:11px; background:#fca5a5; border-radius:50%; flex-shrink:0"></div>
+    <div style="z-index:1; width:11px; height:11px; background:#fdba74; border-radius:50%; flex-shrink:0"></div>
+    <div style="z-index:1; width:11px; height:11px; background:#fef08a; border-radius:50%; flex-shrink:0"></div>
+    <div style="z-index:1; width:11px; height:11px; background:#d9f99d; border-radius:50%; flex-shrink:0"></div>
+    <div style="z-index:1; width:11px; height:11px; background:#86efac; border-radius:50%; flex-shrink:0"></div>
+    <div style="z-index:1; width:28px; height:28px; background:#16a34a; border-radius:50%; border:3px solid #fff7f7; box-shadow:0 0 0 2px #16a34a; flex-shrink:0"></div>
+  </div>
+  <!-- labels below dots -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding:0 2px">
+    <div style="text-align:center; width:80px">
+      <div style="font-size:10px; color:#991b1b; font-weight:700">เดือนที่ 0</div>
+      <div style="font-size:10px; color:#7f1d1d">จ่าย ผรม</div>
+      <div id="f_cfOut" style="font-size:15px; font-weight:800; color:#dc2626; margin-top:3px">-</div>
+    </div>
+    <div style="display:flex; justify-content:space-around; flex:1; padding-top:1px">
+      <div style="font-size:10px; color:#9ca3af; text-align:center">1</div>
+      <div style="font-size:10px; color:#9ca3af; text-align:center">2</div>
+      <div style="font-size:10px; color:#9ca3af; text-align:center">3</div>
+      <div style="font-size:10px; color:#9ca3af; text-align:center">4</div>
+      <div style="font-size:10px; color:#9ca3af; text-align:center">5</div>
+    </div>
+    <div style="text-align:center; width:80px">
+      <div style="font-size:10px; color:#166534; font-weight:700">เดือนที่ 6+</div>
+      <div style="font-size:10px; color:#14532d">รับจาก WW</div>
+      <div id="f_cfIn" style="font-size:15px; font-weight:800; color:#16a34a; margin-top:3px">-</div>
+    </div>
+  </div>
+
+  <!-- summary boxes -->
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px">
     <div style="background:#fee2e2; border-radius:10px; padding:14px; text-align:center">
       <div style="font-size:11px; color:#991b1b; font-weight:700; text-transform:uppercase; letter-spacing:.5px">สำรองจ่ายทันที</div>
-      <div id="f_cfOut" style="font-size:22px; font-weight:800; color:#dc2626; margin-top:4px">-</div>
+      <div id="f_cfOutBox" style="font-size:20px; font-weight:800; color:#dc2626; margin-top:4px">-</div>
       <div style="font-size:11px; color:#991b1b; margin-top:2px">ค่าผู้รับเหมาช่วง</div>
     </div>
     <div style="background:#fef3c7; border-radius:10px; padding:14px; text-align:center">
       <div style="font-size:11px; color:#92400e; font-weight:700; text-transform:uppercase; letter-spacing:.5px">ระยะเวลารอ</div>
-      <div style="font-size:22px; font-weight:800; color:#d97706; margin-top:4px">6+ เดือน</div>
+      <div style="font-size:20px; font-weight:800; color:#d97706; margin-top:4px">6+ เดือน</div>
       <div style="font-size:11px; color:#92400e; margin-top:2px">ก่อนเบิกได้</div>
-    </div>
-    <div style="background:#dcfce7; border-radius:10px; padding:14px; text-align:center">
-      <div style="font-size:11px; color:#166534; font-weight:700; text-transform:uppercase; letter-spacing:.5px">รับจาก WW</div>
-      <div id="f_cfIn" style="font-size:22px; font-weight:800; color:#16a34a; margin-top:4px">-</div>
-      <div style="font-size:11px; color:#166534; margin-top:2px">รอ 6+ เดือน</div>
     </div>
     <div style="background:#eff6ff; border-radius:10px; padding:14px; text-align:center; border:2px solid #bfdbfe">
       <div style="font-size:11px; color:#1e40af; font-weight:700; text-transform:uppercase; letter-spacing:.5px">กำไรต่องาน</div>
-      <div id="f_cfProfit" style="font-size:22px; font-weight:800; color:#2563eb; margin-top:4px">-</div>
+      <div id="f_cfProfit" style="font-size:20px; font-weight:800; color:#2563eb; margin-top:4px">-</div>
       <div style="font-size:11px; color:#1e40af; margin-top:2px">หลังหัก WW 15%</div>
     </div>
   </div>
@@ -453,6 +521,7 @@ function calcTab(items, prefix){
   const netPerJob = jobs>0 ? mNet/jobs : 0;
   $(prefix+'mNetBig').textContent  = (mNet>=0?'':'-')+fmt(Math.abs(mNet));
   $(prefix+'mNetBig').style.color  = mNet>=0?'#16a34a':'var(--red)';
+  $(prefix+'jobsLabel').textContent = jobs;
   $(prefix+'kNetPerJob').textContent = (netPerJob>=0?'':'-')+fmt(Math.abs(netPerJob));
   $(prefix+'kNetPerJob').style.color = netPerJob>=0?'#166534':'var(--red)';
   $(prefix+'pctNet').textContent   = mRev>0?((mNet/mRev)*100).toFixed(2)+'%':'0%';
@@ -468,6 +537,7 @@ function calcTab(items, prefix){
   }
 
   $(prefix+'cfOut').textContent    = '-'+fmt(totSub);
+  $(prefix+'cfOutBox').textContent = '-'+fmt(totSub);
   $(prefix+'cfIn').textContent     = fmt2(totWW);
   $(prefix+'cfProfit').textContent = (totGP>=0?'':'-')+fmt(Math.abs(totGP));
   $(prefix+'cfProfit').style.color = totGP>=0?'#2563eb':'var(--red)';
