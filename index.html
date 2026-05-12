@@ -879,7 +879,7 @@ function recalcFttx(){
 }
 
 // ══════════════ PUI TAB DATA ══════════════
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1zZFyEPTf6XIzQqjvdxCNULfOyw1tBzdWXWjOudAWxGI/export?format=csv&gid=114815191';
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1zZFyEPTf6XIzQqjvdxCNULfOyw1tBzdWXWjOudAWxGI/gviz/tq?tqx=out:csv&gid=114815191';
 const SHEET_REFRESH_MS = 60000;
 
 // fallback ใช้เมื่อ fetch ไม่สำเร็จ
@@ -1180,7 +1180,7 @@ setInterval(()=>{
 }, SHEET_REFRESH_MS);
 
 // ══════════════ EXPENSE TAB ══════════════
-const EXPENSE_SHEET_URL='https://docs.google.com/spreadsheets/d/1Ntj-Faeg3d-eft9HVSgaJFYSN8olY5gKsGej0ZBsQRU/export?format=csv&gid=0';
+const EXPENSE_SHEET_URL='https://docs.google.com/spreadsheets/d/1Ntj-Faeg3d-eft9HVSgaJFYSN8olY5gKsGej0ZBsQRU/gviz/tq?tqx=out:csv&gid=0';
 let expenseChart=null;
 
 function setExpenseStatus(icon,text,isError){
