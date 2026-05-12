@@ -1188,7 +1188,7 @@ function renderExpenseTab(csvText){
   const lines=csvText.split('\n').filter(l=>l.trim());
   if(lines.length<2){setExpenseStatus('⚠️','ไม่พบข้อมูลในชีต',true);return;}
 
-  const headers=parseCSVRow(lines[2]||lines[0]).map(h=>h.trim().replace(/^"|"$/g,''));
+  let headers=parseCSVRow(lines[2]||lines[0]).map(h=>h.trim().replace(/^"|"$/g,''));
 
   // parse rows + กรอง ยอดยกมา ออก (เริ่มจาก row 4)
   const rows=[];
@@ -1199,6 +1199,10 @@ function renderExpenseTab(csvText){
     rows.push(cols);
   }
   if(rows.length===0){setExpenseStatus('⚠️','ไม่พบข้อมูลในชีต',true);return;}
+
+  // pad headers ให้ครบทุก column ที่มีใน data
+  const maxCols=Math.max(headers.length,...rows.map(r=>r.length));
+  while(headers.length<maxCols) headers.push('');
 
   // ตรวจคอลัมน์ตัวเลข — ใช้ Number() แทน parseFloat เพื่อไม่ให้ date "09/04/2026" ถูกนับเป็น numeric
   const isNumCol=headers.map((_,i)=>{
