@@ -1272,8 +1272,7 @@ function renderExpenseTab(csvText){
   kpiRow.innerHTML=`
     <div class="kpi green"><span class="lbl">รายรับรวม</span><span class="val">${fmt(sumD)}</span><span class="sub">${headers[3]||'Col D'}</span></div>
     <div class="kpi red"><span class="lbl">รายจ่ายรวม</span><span class="val">${fmt(sumE)}</span><span class="sub">${headers[4]||'Col E'}</span></div>
-    <div class="kpi ${net>=0?'blue':'red'}"><span class="lbl">คงเหลือสุทธิ</span><span class="val" style="color:${net>=0?'var(--primary)':'var(--red)'}">${net>=0?'':'-'}${fmt(Math.abs(net))}</span><span class="sub">รายรับ − รายจ่าย</span></div>
-    <div class="kpi amber"><span class="lbl">จำนวนรายการ</span><span class="val">${rows.length.toLocaleString()}</span><span class="sub">รายการ (ไม่รวม ยอดยกมา)</span></div>`;
+    <div class="kpi ${net>=0?'blue':'red'}"><span class="lbl">คงเหลือสุทธิ</span><span class="val" style="color:${net>=0?'var(--primary)':'var(--red)'}">${net>=0?'':'-'}${fmt(Math.abs(net))}</span><span class="sub">รายรับ − รายจ่าย</span></div>`;
 
 }
 
