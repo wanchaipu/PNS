@@ -1188,11 +1188,11 @@ function renderExpenseTab(csvText){
   const lines=csvText.split('\n').filter(l=>l.trim());
   if(lines.length<2){setExpenseStatus('⚠️','ไม่พบข้อมูลในชีต',true);return;}
 
-  const headers=parseCSVRow(lines[1]||lines[0]).map(h=>h.trim().replace(/^"|"$/g,''));
+  const headers=parseCSVRow(lines[2]||lines[0]).map(h=>h.trim().replace(/^"|"$/g,''));
 
-  // parse rows + กรอง ยอดยกมา ออก (เริ่มจาก row 3)
+  // parse rows + กรอง ยอดยกมา ออก (เริ่มจาก row 4)
   const rows=[];
-  for(let i=2;i<lines.length;i++){
+  for(let i=3;i<lines.length;i++){
     const cols=parseCSVRow(lines[i]).map(c=>c.trim().replace(/^"|"$/g,''));
     if(cols.every(c=>!c)) continue;
     if(cols.some(c=>c.includes('ยอดยกมา'))) continue;
