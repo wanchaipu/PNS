@@ -1206,6 +1206,10 @@ function renderExpenseTab(csvText){
   const maxCols=Math.max(headers.length,...rows.map(r=>r.length));
   while(headers.length<maxCols) headers.push('');
 
+  // หา index ของ รายรับ / รายจ่าย จากชื่อ header
+  const incomeIdx=headers.findIndex(h=>h.includes('รายรับ'));
+  const expenseIdx=headers.findIndex(h=>h.includes('รายจ่าย'));
+
   // ตรวจคอลัมน์ตัวเลข — ใช้ Number() แทน parseFloat เพื่อไม่ให้ date "09/04/2026" ถูกนับเป็น numeric
   const isNumCol=headers.map((_,i)=>{
     const numCount=rows.filter(r=>{
@@ -1214,15 +1218,6 @@ function renderExpenseTab(csvText){
     }).length;
     return numCount>rows.length*0.3;
   });
-  // ตรวจคอลัมน์หมวดหมู่ (text + cardinality ต่ำ)
-  const isCatCol=headers.map((_,i)=>{
-    if(isNumCol[i]) return false;
-    const uniq=[...new Set(rows.map(r=>r[i]).filter(v=>v))];
-    return uniq.length>=2&&uniq.length<=Math.max(rows.length*0.6,30);
-  });
-
-  const mainNumIdx=isNumCol.findIndex(v=>v);
-  const mainCatIdx=isCatCol.findIndex(v=>v);
 
   // thead + คอลัมน์ #
   $('expense_thead').innerHTML=
@@ -1239,13 +1234,12 @@ function renderExpenseTab(csvText){
     html+=headers.map((_,i)=>{
       const v=row[i]||'';
       if(isNumCol[i]){
-        const n=parseFloat(v.replace(/[,฿\s]/g,''));
+        const n=Number(v.replace(/[,฿\s]/g,''));
         if(!isNaN(n)&&n!==0){
-          // col D (index 3) = รายรับ → เขียว, col E (index 4) = รายจ่าย → แดง
-          const color=i===3?'color:var(--green);font-weight:600':i===4?'color:var(--red);font-weight:600':n<0?'color:var(--red);font-weight:600':'color:var(--green);font-weight:600';
+          const color=i===incomeIdx?'color:var(--green);font-weight:600':i===expenseIdx?'color:var(--red);font-weight:600':'';
           return `<td class="num" style="${color}">฿${n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
         }
-        return `<td class="num" style="color:var(--muted)">${v||'-'}</td>`;
+        return `<td class="num" style="color:var(--muted)">-</td>`;
       }
       return `<td>${v}</td>`;
     }).join('');
@@ -1260,9 +1254,9 @@ function renderExpenseTab(csvText){
   totHtml+=headers.map((_,i)=>{
     if(i===0) return '<td style="text-align:right">รวมทั้งหมด</td>';
     if(isNumCol[i]){
-      const s=rows.reduce((a,r)=>a+(parseFloat((r[i]||'').replace(/[,฿\s]/g,''))||0),0);
+      const s=rows.reduce((a,r)=>a+(Number((r[i]||'').replace(/[,฿\s]/g,''))||0),0);
       if(s===0) return '<td></td>';
-      const color=i===3?'color:var(--green)':i===4?'color:var(--red)':s<0?'color:var(--red)':'color:var(--green)';
+      const color=i===incomeIdx?'color:var(--green)':i===expenseIdx?'color:var(--red)':'';
       return `<td class="num" style="${color}">฿${s.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
     }
     return '<td></td>';
@@ -1270,14 +1264,14 @@ function renderExpenseTab(csvText){
   tot.innerHTML=totHtml;
   tbody.appendChild(tot);
 
-  // KPI cards — col D=รายรับ (idx 3), col E=รายจ่าย (idx 4)
+  // KPI cards — ค้นหาจาก header name
   const kpiRow=$('expense_kpi_row');
-  const sumD=rows.reduce((a,r)=>a+(parseFloat((r[3]||'').replace(/[,฿\s]/g,''))||0),0);
-  const sumE=rows.reduce((a,r)=>a+(parseFloat((r[4]||'').replace(/[,฿\s]/g,''))||0),0);
-  const net=sumD-sumE;
+  const sumIncome =rows.reduce((a,r)=>a+(Number((r[incomeIdx] ||'').replace(/[,฿\s]/g,''))||0),0);
+  const sumExpense=rows.reduce((a,r)=>a+(Number((r[expenseIdx]||'').replace(/[,฿\s]/g,''))||0),0);
+  const net=sumIncome-sumExpense;
   kpiRow.innerHTML=`
-    <div class="kpi green"><span class="lbl">รายรับรวม</span><span class="val">${fmt(sumD)}</span><span class="sub">${headers[3]||'Col D'}</span></div>
-    <div class="kpi red"><span class="lbl">รายจ่ายรวม</span><span class="val">${fmt(sumE)}</span><span class="sub">${headers[4]||'Col E'}</span></div>
+    <div class="kpi green"><span class="lbl">รายรับรวม</span><span class="val">${fmt(sumIncome)}</span><span class="sub">${headers[incomeIdx]||'-'}</span></div>
+    <div class="kpi red"><span class="lbl">รายจ่ายรวม</span><span class="val">${fmt(sumExpense)}</span><span class="sub">${headers[expenseIdx]||'-'}</span></div>
     <div class="kpi ${net>=0?'blue':'red'}"><span class="lbl">คงเหลือสุทธิ</span><span class="val" style="color:${net>=0?'var(--primary)':'var(--red)'}">${net>=0?'':'-'}${fmt(Math.abs(net))}</span><span class="sub">รายรับ − รายจ่าย</span></div>`;
 
 }
