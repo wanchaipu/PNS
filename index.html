@@ -631,10 +631,6 @@
 <div id="expense_kpi_row" class="grid grid-4" style="margin-bottom:20px"></div>
 
 <div class="grid grid-2" id="expense_content_grid">
-  <div class="card" id="expense_chart_card" style="display:none">
-    <h2 id="expense_chart_title">กราฟสรุป</h2>
-    <div class="chart-wrap" style="height:380px"><canvas id="expense_chart"></canvas></div>
-  </div>
   <div class="card" id="expense_table_card" style="grid-column:1/-1">
     <h2>ข้อมูลทั้งหมด</h2>
     <div style="overflow:auto;max-height:520px">
@@ -1181,8 +1177,6 @@ setInterval(()=>{
 
 // ══════════════ EXPENSE TAB ══════════════
 const EXPENSE_SHEET_URL='https://docs.google.com/spreadsheets/d/1Ntj-Faeg3d-eft9HVSgaJFYSN8olY5gKsGej0ZBsQRU/gviz/tq?tqx=out:csv&gid=0';
-let expenseChart=null;
-
 function setExpenseStatus(icon,text,isError){
   const ic=$('expense_status_icon'),tx=$('expense_status_text');
   if(!ic||!tx) return;
@@ -1284,57 +1278,6 @@ function renderExpenseTab(csvText){
     kpiRow.innerHTML=`<div class="kpi blue"><span class="lbl">จำนวนรายการ</span><span class="val">${rows.length}</span><span class="sub">รายการ (ไม่รวม ยอดยกมา)</span></div>`;
   }
 
-  // Chart: group by category column
-  const chartCard=$('expense_chart_card');
-  const tableCard=$('expense_table_card');
-  if(mainCatIdx>=0&&mainNumIdx>=0){
-    const grouped={};
-    rows.forEach(r=>{
-      const cat=r[mainCatIdx]||'(ไม่ระบุ)';
-      grouped[cat]=(grouped[cat]||0)+(parseFloat((r[mainNumIdx]||'').replace(/[,฿\s]/g,''))||0);
-    });
-    const sorted=Object.entries(grouped).sort((a,b)=>b[1]-a[1]);
-    const pal=['#e11d48','#d97706','#9333ea','#0891b2','#16a34a','#ea580c','#2563eb','#4f46e5','#0d9488','#f59e0b','#8b5cf6','#06b6d4','#22c55e'];
-
-    if(expenseChart) expenseChart.destroy();
-    expenseChart=new Chart($('expense_chart').getContext('2d'),{
-      type:'bar', plugins:[ChartDataLabels],
-      data:{
-        labels:sorted.map(e=>e[0]),
-        datasets:[{
-          label:headers[mainNumIdx],
-          data:sorted.map(e=>e[1]),
-          backgroundColor:sorted.map((_,i)=>pal[i%pal.length]+'cc'),
-          borderColor:sorted.map((_,i)=>pal[i%pal.length]),
-          borderWidth:1,borderRadius:4,
-        }]
-      },
-      options:{
-        indexAxis:'y',responsive:true,maintainAspectRatio:false,
-        layout:{padding:{right:10}},
-        plugins:{
-          legend:{display:false},
-          tooltip:{callbacks:{label:v=>'฿'+Math.round(v.raw).toLocaleString('en-US')}},
-          datalabels:{
-            anchor:'end',align:'end',
-            formatter:v=>v>=1000000?'฿'+(v/1000000).toFixed(1)+'M':'฿'+(v/1000).toFixed(0)+'k',
-            font:{family:'Sarabun',size:11,weight:'700'},
-            color:'#1a2332',clamp:true,
-          }
-        },
-        scales:{
-          x:{ticks:{callback:v=>v>=1000000?'฿'+(v/1000000).toFixed(1)+'M':'฿'+(v/1000).toFixed(0)+'k',font:{family:'Sarabun',size:11}},grid:{color:'#f0f0f0'}},
-          y:{ticks:{font:{family:'Sarabun',size:11}}}
-        }
-      }
-    });
-    $('expense_chart_title').textContent='แยกตาม '+headers[mainCatIdx];
-    chartCard.style.display='';
-    tableCard.style.gridColumn='';
-  } else {
-    chartCard.style.display='none';
-    tableCard.style.gridColumn='1/-1';
-  }
 }
 
 async function loadExpenseData(){
