@@ -1200,9 +1200,12 @@ function renderExpenseTab(csvText){
   }
   if(rows.length===0){setExpenseStatus('⚠️','ไม่พบข้อมูลในชีต',true);return;}
 
-  // ตรวจคอลัมน์ตัวเลข (>30% แถวมีค่าตัวเลข)
+  // ตรวจคอลัมน์ตัวเลข — ใช้ Number() แทน parseFloat เพื่อไม่ให้ date "09/04/2026" ถูกนับเป็น numeric
   const isNumCol=headers.map((_,i)=>{
-    const numCount=rows.filter(r=>!isNaN(parseFloat((r[i]||'').replace(/[,฿\s]/g,'')))).length;
+    const numCount=rows.filter(r=>{
+      const v=(r[i]||'').replace(/[,฿\s]/g,'');
+      return v!==''&&!isNaN(Number(v));
+    }).length;
     return numCount>rows.length*0.3;
   });
   // ตรวจคอลัมน์หมวดหมู่ (text + cardinality ต่ำ)
