@@ -1196,11 +1196,12 @@ function renderExpenseTab(csvText){
 
   const headers=parseCSVRow(lines[0]).map(h=>h.trim().replace(/^"|"$/g,''));
 
-  // parse rows
+  // parse rows + กรอง ยอดยกมา ออก
   const rows=[];
   for(let i=1;i<lines.length;i++){
     const cols=parseCSVRow(lines[i]).map(c=>c.trim().replace(/^"|"$/g,''));
     if(cols.every(c=>!c)) continue;
+    if(cols.some(c=>c.includes('ยอดยกมา'))) continue;
     rows.push(cols);
   }
   if(rows.length===0){setExpenseStatus('⚠️','ไม่พบข้อมูลในชีต',true);return;}
@@ -1220,22 +1221,32 @@ function renderExpenseTab(csvText){
   const mainNumIdx=isNumCol.findIndex(v=>v);
   const mainCatIdx=isCatCol.findIndex(v=>v);
 
-  // thead
-  $('expense_thead').innerHTML='<tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr>';
+  // thead + คอลัมน์ #
+  $('expense_thead').innerHTML=
+    '<tr><th style="width:36px;text-align:center">#</th>'+
+    headers.map(h=>`<th>${h}</th>`).join('')+'</tr>';
 
-  // tbody
+  // tbody — striped + format ฿ + color coding
   const tbody=$('expense_tbody');
   tbody.innerHTML='';
-  rows.forEach(row=>{
+  rows.forEach((row,idx)=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=headers.map((_,i)=>{
+    tr.style.background=idx%2===0?'#fff':'#f8fafc';
+    let html=`<td style="color:var(--muted);font-size:11px;text-align:center;white-space:nowrap">${idx+1}</td>`;
+    html+=headers.map((_,i)=>{
       const v=row[i]||'';
       if(isNumCol[i]){
         const n=parseFloat(v.replace(/[,฿\s]/g,''));
-        return `<td class="num">${!isNaN(n)?n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):v}</td>`;
+        if(!isNaN(n)){
+          const color=n<0?'color:var(--red);font-weight:600':'color:var(--green);font-weight:600';
+          const sign=n<0?'-':'';
+          return `<td class="num" style="${color}">${sign}฿${Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+        }
+        return `<td class="num">${v}</td>`;
       }
       return `<td>${v}</td>`;
     }).join('');
+    tr.innerHTML=html;
     tbody.appendChild(tr);
   });
 
@@ -1243,14 +1254,17 @@ function renderExpenseTab(csvText){
   if(mainNumIdx>=0){
     const tot=document.createElement('tr');
     tot.className='total';
-    tot.innerHTML=headers.map((_,i)=>{
-      if(i===0) return '<td style="text-align:right">รวม</td>';
+    let html='<td></td>';
+    html+=headers.map((_,i)=>{
+      if(i===0) return '<td style="text-align:right">รวมทั้งหมด</td>';
       if(isNumCol[i]){
         const s=rows.reduce((a,r)=>a+(parseFloat((r[i]||'').replace(/[,฿\s]/g,''))||0),0);
-        return `<td class="num">${s.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+        const color=s<0?'color:var(--red)':'color:var(--green)';
+        return `<td class="num" style="${color}">฿${s.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
       }
       return '<td></td>';
     }).join('');
+    tot.innerHTML=html;
     tbody.appendChild(tot);
   }
 
@@ -1263,11 +1277,11 @@ function renderExpenseTab(csvText){
     const maxV=Math.max(...nums);
     kpiRow.innerHTML=`
       <div class="kpi red"><span class="lbl">ยอดรวมทั้งหมด</span><span class="val">${fmt(total)}</span><span class="sub">${headers[mainNumIdx]}</span></div>
-      <div class="kpi amber"><span class="lbl">จำนวนรายการ</span><span class="val">${rows.length}</span><span class="sub">รายการ</span></div>
+      <div class="kpi amber"><span class="lbl">จำนวนรายการ</span><span class="val">${rows.length.toLocaleString()}</span><span class="sub">รายการ (ไม่รวม ยอดยกมา)</span></div>
       <div class="kpi blue"><span class="lbl">เฉลี่ย / รายการ</span><span class="val">${fmt(avg)}</span><span class="sub">บาท</span></div>
       <div class="kpi pink"><span class="lbl">รายการสูงสุด</span><span class="val">${fmt(maxV)}</span><span class="sub">บาท</span></div>`;
   } else {
-    kpiRow.innerHTML=`<div class="kpi blue"><span class="lbl">จำนวนรายการ</span><span class="val">${rows.length}</span><span class="sub">รายการ</span></div>`;
+    kpiRow.innerHTML=`<div class="kpi blue"><span class="lbl">จำนวนรายการ</span><span class="val">${rows.length}</span><span class="sub">รายการ (ไม่รวม ยอดยกมา)</span></div>`;
   }
 
   // Chart: group by category column
