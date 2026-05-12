@@ -634,8 +634,8 @@
   <div class="card" id="expense_table_card" style="grid-column:1/-1">
     <h2>ข้อมูลทั้งหมด</h2>
     <div style="overflow:auto;max-height:520px">
-      <table>
-        <thead id="expense_thead"></thead>
+      <table style="position:relative">
+        <thead id="expense_thead" style="position:sticky;top:0;z-index:2"></thead>
         <tbody id="expense_tbody"></tbody>
       </table>
     </div>
@@ -1220,8 +1220,8 @@ function renderExpenseTab(csvText){
 
   // thead + คอลัมน์ #
   $('expense_thead').innerHTML=
-    '<tr><th style="width:36px;text-align:center">#</th>'+
-    headers.map(h=>`<th>${h}</th>`).join('')+'</tr>';
+    '<tr><th style="width:36px;text-align:center;position:sticky;top:0;background:#f8fafc;box-shadow:0 1px 0 var(--line)">#</th>'+
+    headers.map(h=>`<th style="position:sticky;top:0;background:#f8fafc;box-shadow:0 1px 0 var(--line);white-space:nowrap">${h}</th>`).join('')+'</tr>';
 
   // tbody — striped + format ฿ + color coding
   const tbody=$('expense_tbody');
