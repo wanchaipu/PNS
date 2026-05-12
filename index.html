@@ -77,6 +77,8 @@
   .tab-btn.active.org{background:linear-gradient(135deg,#6b21a8,#9333ea); color:#fff; box-shadow:0 4px 12px rgba(147,51,234,.25)}
   .tab-btn.active.pui{background:linear-gradient(135deg,#92400e,#d97706); color:#fff; box-shadow:0 4px 12px rgba(217,119,6,.3)}
   header.pui-header{background:linear-gradient(135deg,#92400e,#d97706)}
+  .tab-btn.active.expense{background:linear-gradient(135deg,#881337,#e11d48); color:#fff; box-shadow:0 4px 12px rgba(225,29,72,.28)}
+  header.expense-header{background:linear-gradient(135deg,#881337,#e11d48)}
   .tab-panel{display:none}
   .tab-panel.active{display:block}
   .warn-row td{background:#fff7ed !important}
@@ -106,6 +108,7 @@
   <button class="tab-btn fttx" data-tab="fttx" onclick="switchTab('fttx')">คำนวนกำไร 🔧 FTTX (ติดตั้งใหม่)</button>
   <button class="tab-btn org" data-tab="org" onclick="switchTab('org')">🏢 PNS – โครงสร้างบริษัท</button>
   <button class="tab-btn pui" data-tab="pui" onclick="switchTab('pui')">💰 ค่าใช้จ่ายพี่ปุย</button>
+  <button class="tab-btn expense" data-tab="expense" onclick="switchTab('expense')">💸 ค่าใช้จ่าย</button>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -607,6 +610,44 @@
 
 </div><!-- /tab-pui -->
 
+<!-- ══════════════════════════════════════
+     TAB 5: ค่าใช้จ่าย
+══════════════════════════════════════ -->
+<div id="tab-expense" class="tab-panel">
+
+<header class="expense-header">
+  <h1>💸 ค่าใช้จ่าย</h1>
+  <div class="meta">ดึงข้อมูลตรงจาก Google Sheet · อัปเดตอัตโนมัติทุก 60 วินาที</div>
+</header>
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+  <div style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
+    <span id="expense_status_icon">⏳</span>
+    <span id="expense_status_text">กำลังโหลดข้อมูลจาก Google Sheet...</span>
+  </div>
+  <button onclick="loadExpenseData()" style="padding:6px 14px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:13px;color:var(--ink)">🔄 รีเฟรช</button>
+</div>
+
+<div id="expense_kpi_row" class="grid grid-4" style="margin-bottom:20px"></div>
+
+<div class="grid grid-2" id="expense_content_grid">
+  <div class="card" id="expense_chart_card" style="display:none">
+    <h2 id="expense_chart_title">กราฟสรุป</h2>
+    <div class="chart-wrap" style="height:380px"><canvas id="expense_chart"></canvas></div>
+  </div>
+  <div class="card" id="expense_table_card" style="grid-column:1/-1">
+    <h2>ข้อมูลทั้งหมด</h2>
+    <div style="overflow:auto;max-height:520px">
+      <table>
+        <thead id="expense_thead"></thead>
+        <tbody id="expense_tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /tab-expense -->
+
 </div><!-- /wrap -->
 
 <script>
@@ -623,6 +664,7 @@ function switchTab(name){
   $('tab-'+name).classList.add('active');
   document.querySelector(`.tab-btn[data-tab="${name}"]`).classList.add('active');
   if(name==='pui') initPuiCharts();
+  if(name==='expense') loadExpenseData();
 }
 
 // ══════════════ DECOM DATA (ตัวอย่างรับงาน 1 site Decom) ══════════════
@@ -1136,6 +1178,168 @@ document.addEventListener('input', e=>{
 setInterval(()=>{
   if($('tab-pui').classList.contains('active')) loadSheetData();
 }, SHEET_REFRESH_MS);
+
+// ══════════════ EXPENSE TAB ══════════════
+const EXPENSE_SHEET_URL='https://docs.google.com/spreadsheets/d/1Ntj-Faeg3d-eft9HVSgaJFYSN8olY5gKsGej0ZBsQRU/export?format=csv&gid=0';
+let expenseChart=null;
+
+function setExpenseStatus(icon,text,isError){
+  const ic=$('expense_status_icon'),tx=$('expense_status_text');
+  if(!ic||!tx) return;
+  ic.textContent=icon; tx.textContent=text;
+  tx.style.color=isError?'var(--red)':'var(--muted)';
+}
+
+function renderExpenseTab(csvText){
+  const lines=csvText.split('\n').filter(l=>l.trim());
+  if(lines.length<2){setExpenseStatus('⚠️','ไม่พบข้อมูลในชีต',true);return;}
+
+  const headers=parseCSVRow(lines[0]).map(h=>h.trim().replace(/^"|"$/g,''));
+
+  // parse rows
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const cols=parseCSVRow(lines[i]).map(c=>c.trim().replace(/^"|"$/g,''));
+    if(cols.every(c=>!c)) continue;
+    rows.push(cols);
+  }
+  if(rows.length===0){setExpenseStatus('⚠️','ไม่พบข้อมูลในชีต',true);return;}
+
+  // ตรวจคอลัมน์ตัวเลข (>30% แถวมีค่าตัวเลข)
+  const isNumCol=headers.map((_,i)=>{
+    const numCount=rows.filter(r=>!isNaN(parseFloat((r[i]||'').replace(/[,฿\s]/g,'')))).length;
+    return numCount>rows.length*0.3;
+  });
+  // ตรวจคอลัมน์หมวดหมู่ (text + cardinality ต่ำ)
+  const isCatCol=headers.map((_,i)=>{
+    if(isNumCol[i]) return false;
+    const uniq=[...new Set(rows.map(r=>r[i]).filter(v=>v))];
+    return uniq.length>=2&&uniq.length<=Math.max(rows.length*0.6,30);
+  });
+
+  const mainNumIdx=isNumCol.findIndex(v=>v);
+  const mainCatIdx=isCatCol.findIndex(v=>v);
+
+  // thead
+  $('expense_thead').innerHTML='<tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr>';
+
+  // tbody
+  const tbody=$('expense_tbody');
+  tbody.innerHTML='';
+  rows.forEach(row=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=headers.map((_,i)=>{
+      const v=row[i]||'';
+      if(isNumCol[i]){
+        const n=parseFloat(v.replace(/[,฿\s]/g,''));
+        return `<td class="num">${!isNaN(n)?n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):v}</td>`;
+      }
+      return `<td>${v}</td>`;
+    }).join('');
+    tbody.appendChild(tr);
+  });
+
+  // total row
+  if(mainNumIdx>=0){
+    const tot=document.createElement('tr');
+    tot.className='total';
+    tot.innerHTML=headers.map((_,i)=>{
+      if(i===0) return '<td style="text-align:right">รวม</td>';
+      if(isNumCol[i]){
+        const s=rows.reduce((a,r)=>a+(parseFloat((r[i]||'').replace(/[,฿\s]/g,''))||0),0);
+        return `<td class="num">${s.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+      }
+      return '<td></td>';
+    }).join('');
+    tbody.appendChild(tot);
+  }
+
+  // KPI cards
+  const kpiRow=$('expense_kpi_row');
+  if(mainNumIdx>=0){
+    const nums=rows.map(r=>parseFloat((r[mainNumIdx]||'').replace(/[,฿\s]/g,''))||0);
+    const total=nums.reduce((a,v)=>a+v,0);
+    const avg=total/rows.length;
+    const maxV=Math.max(...nums);
+    kpiRow.innerHTML=`
+      <div class="kpi red"><span class="lbl">ยอดรวมทั้งหมด</span><span class="val">${fmt(total)}</span><span class="sub">${headers[mainNumIdx]}</span></div>
+      <div class="kpi amber"><span class="lbl">จำนวนรายการ</span><span class="val">${rows.length}</span><span class="sub">รายการ</span></div>
+      <div class="kpi blue"><span class="lbl">เฉลี่ย / รายการ</span><span class="val">${fmt(avg)}</span><span class="sub">บาท</span></div>
+      <div class="kpi pink"><span class="lbl">รายการสูงสุด</span><span class="val">${fmt(maxV)}</span><span class="sub">บาท</span></div>`;
+  } else {
+    kpiRow.innerHTML=`<div class="kpi blue"><span class="lbl">จำนวนรายการ</span><span class="val">${rows.length}</span><span class="sub">รายการ</span></div>`;
+  }
+
+  // Chart: group by category column
+  const chartCard=$('expense_chart_card');
+  const tableCard=$('expense_table_card');
+  if(mainCatIdx>=0&&mainNumIdx>=0){
+    const grouped={};
+    rows.forEach(r=>{
+      const cat=r[mainCatIdx]||'(ไม่ระบุ)';
+      grouped[cat]=(grouped[cat]||0)+(parseFloat((r[mainNumIdx]||'').replace(/[,฿\s]/g,''))||0);
+    });
+    const sorted=Object.entries(grouped).sort((a,b)=>b[1]-a[1]);
+    const pal=['#e11d48','#d97706','#9333ea','#0891b2','#16a34a','#ea580c','#2563eb','#4f46e5','#0d9488','#f59e0b','#8b5cf6','#06b6d4','#22c55e'];
+
+    if(expenseChart) expenseChart.destroy();
+    expenseChart=new Chart($('expense_chart').getContext('2d'),{
+      type:'bar', plugins:[ChartDataLabels],
+      data:{
+        labels:sorted.map(e=>e[0]),
+        datasets:[{
+          label:headers[mainNumIdx],
+          data:sorted.map(e=>e[1]),
+          backgroundColor:sorted.map((_,i)=>pal[i%pal.length]+'cc'),
+          borderColor:sorted.map((_,i)=>pal[i%pal.length]),
+          borderWidth:1,borderRadius:4,
+        }]
+      },
+      options:{
+        indexAxis:'y',responsive:true,maintainAspectRatio:false,
+        layout:{padding:{right:10}},
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:v=>'฿'+Math.round(v.raw).toLocaleString('en-US')}},
+          datalabels:{
+            anchor:'end',align:'end',
+            formatter:v=>v>=1000000?'฿'+(v/1000000).toFixed(1)+'M':'฿'+(v/1000).toFixed(0)+'k',
+            font:{family:'Sarabun',size:11,weight:'700'},
+            color:'#1a2332',clamp:true,
+          }
+        },
+        scales:{
+          x:{ticks:{callback:v=>v>=1000000?'฿'+(v/1000000).toFixed(1)+'M':'฿'+(v/1000).toFixed(0)+'k',font:{family:'Sarabun',size:11}},grid:{color:'#f0f0f0'}},
+          y:{ticks:{font:{family:'Sarabun',size:11}}}
+        }
+      }
+    });
+    $('expense_chart_title').textContent='แยกตาม '+headers[mainCatIdx];
+    chartCard.style.display='';
+    tableCard.style.gridColumn='';
+  } else {
+    chartCard.style.display='none';
+    tableCard.style.gridColumn='1/-1';
+  }
+}
+
+async function loadExpenseData(){
+  setExpenseStatus('⏳','กำลังโหลดข้อมูลจาก Google Sheet...',false);
+  try{
+    const res=await fetch(EXPENSE_SHEET_URL);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const text=await res.text();
+    renderExpenseTab(text);
+    const now=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    setExpenseStatus('✅',`อัปเดตล่าสุด ${now} · รีเฟรชอัตโนมัติทุก 60 วินาที`,false);
+  }catch(e){
+    setExpenseStatus('⚠️','โหลดไม่สำเร็จ: '+e.message,true);
+  }
+}
+
+setInterval(()=>{
+  if($('tab-expense').classList.contains('active')) loadExpenseData();
+},60000);
 </script>
 </body>
 </html>
